@@ -7,7 +7,6 @@ import { HeroSection } from './HeroSection';
 import { Footer } from './Footer';
 import { Button } from './ui/button';
 import { Person, SearchFilters } from '@/types/person';
-import { searchPersons, getPersonStatistics } from '@/services/api';
 import { toast } from 'sonner';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -34,11 +33,20 @@ export function HomePage({ onPersonClick }: HomePageProps) {
   const loadPersons = async () => {
     try {
       setLoading(true);
-      const result = await searchPersons({
-        page: currentPage,
-        pageSize,
-        filters: searchFilters || undefined
+      
+      // Construir URL com parâmetros de paginação apenas
+      const urlParams = new URLSearchParams({
+        page: currentPage.toString(),
+        pageSize: pageSize.toString()
       });
+
+      const response = await fetch(`/api/pessoas?${urlParams.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error(`Erro na API: ${response.status}`);
+      }
+
+      const result = await response.json();
       setPersons(result.data);
       setTotalPages(Math.ceil(result.total / pageSize));
     } catch (error) {
@@ -51,7 +59,13 @@ export function HomePage({ onPersonClick }: HomePageProps) {
 
   const loadStatistics = async () => {
     try {
-      const stats = await getPersonStatistics();
+      const response = await fetch('/api/estatisticas');
+      
+      if (!response.ok) {
+        throw new Error(`Erro na API: ${response.status}`);
+      }
+
+      const stats = await response.json();
       setStatistics(stats);
     } catch (error) {
       console.error('Erro ao carregar estatísticas:', error);

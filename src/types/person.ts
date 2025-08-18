@@ -1,6 +1,7 @@
 export interface Person {
   id: number;
   nome: string;
+  idade?: number;
   dtNascimento?: string;
   dtDesaparecimento?: string;
   localDesaparecimentoConcat?: string;

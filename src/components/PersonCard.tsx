@@ -41,7 +41,8 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
     }
   };
 
-  const age = calculateAge(person.dtNascimento);
+  // Usar idade da API se disponível, senão calcular pela data de nascimento
+  const age = person.idade || calculateAge(person.dtNascimento);
 
   return (
     <Card 

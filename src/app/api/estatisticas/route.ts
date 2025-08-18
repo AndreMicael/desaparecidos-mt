@@ -9,7 +9,7 @@ interface Statistics {
 export async function GET() {
   try {
     // Fazer uma requisição para obter estatísticas (primeira página com tamanho grande)
-    const url = 'https://abitus-api.geia.vip/v1/pessoas/aberto/filtro?pagina=1&porPagina=1000&faixaIdadeInicial=0&faixaIdadeFinal=120';
+    const url = 'https://abitus-api.geia.vip/v1/pessoas/aberto/filtro';
     
     const response = await fetch(url, {
       method: 'GET',

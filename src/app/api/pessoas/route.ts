@@ -16,8 +16,11 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '12');
 
+    // Converter página do frontend (1-based) para API externa (0-based)
+    const externalPage = page - 1;
+
     // Fazer requisição direta para a API externa com a página específica
-    const url = `https://abitus-api.geia.vip/v1/pessoas/aberto/filtro?pagina=${page}&porPagina=${pageSize}&faixaIdadeInicial=0&faixaIdadeFinal=120`;
+    const url = `https://abitus-api.geia.vip/v1/pessoas/aberto/filtro?pagina=${externalPage}&porPagina=${pageSize}`;
     
     const response = await fetch(url, {
       method: 'GET',
@@ -38,7 +41,7 @@ export async function GET(request: NextRequest) {
     const result: SearchResult = {
       data: mappedData,
       total: data.totalElements,
-      page: page,
+      page: page, // Manter a página original do frontend (1-based)
       pageSize: pageSize
     };
 

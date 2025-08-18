@@ -135,15 +135,13 @@ export function HomePage({ onPersonClick }: HomePageProps) {
                 {!loading && persons.length > 0 && (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                      {persons
-                        .filter(person => activeTab === 'desaparecidos' ? !person.localizado : person.localizado)
-                        .map((person) => (
-                          <PersonCard
-                            key={person.id}
-                            person={person}
-                            onClick={() => onPersonClick(person)}
-                          />
-                        ))}
+                      {persons.map((person) => (
+                        <PersonCard
+                          key={person.id}
+                          person={person}
+                          onClick={() => onPersonClick(person)}
+                        />
+                      ))}
                     </div>
 
                     {/* Pagination */}

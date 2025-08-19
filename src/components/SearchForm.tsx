@@ -59,63 +59,63 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
 
   if (compact) {
     return (
-      <div className="bg-yellow-400 rounded-lg overflow-hidden shadow-xl max-w-sm font-encode-sans">
-        {/* Header */}
-        <div className="bg-yellow-400 px-4 py-3 flex items-center gap-2">
-          <Search className="w-5 h-5 text-black" />
-          <h3 className="text-black font-bold text-sm">BUSCAR PESSOA DESAPARECIDA</h3>
+             <div className="bg-black/30 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl w-full max-w-sm font-encode-sans border border-white/20">
+         {/* Header */}
+         <div className="bg-yellow-400 px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2">
+          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
+          <h3 className="text-black font-bold text-xs sm:text-sm">BUSCAR PESSOA DESAPARECIDA</h3>
         </div>
 
         {/* Form */}
-        <div className="p-4 bg-gray-800">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="p-3 sm:p-4 bg-black/50 backdrop-blur-sm">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             {/* Nome */}
-            <div className="space-y-2">
+            <div className="space-y-1 sm:space-y-2">
               <div className="flex items-center gap-2 text-white">
                 <User className="w-3 h-3" />
-                <label className="text-sm text-white">Nome</label>
+                <label className="text-xs sm:text-sm text-white">Nome</label>
               </div>
-              <Input
-                value={filters.nome}
-                onChange={(e) => setFilters(prev => ({ ...prev, nome: e.target.value }))}
-                className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 text-sm h-9"
-                placeholder="Nome"
-              />
+                             <Input
+                 value={filters.nome}
+                 onChange={(e) => setFilters(prev => ({ ...prev, nome: e.target.value }))}
+                 className="bg-black/30 border-white/30 text-white placeholder-gray-300 text-xs sm:text-sm h-8 sm:h-9 focus:border-yellow-400"
+                 placeholder="Nome"
+               />
             </div>
 
             {/* Faixa Etária */}
-            <div className="space-y-2">
-              <label className="text-sm text-white">Faixa Etária:</label>
+            <div className="space-y-1 sm:space-y-2">
+              <label className="text-xs sm:text-sm text-white">Faixa Etária:</label>
               <div className="grid grid-cols-2 gap-2">
-                <Input
-                  type="number"
-                  value={filters.idadeMinima}
-                  onChange={(e) => setFilters(prev => ({ ...prev, idadeMinima: e.target.value }))}
-                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 text-sm h-9"
-                  placeholder="Idade mínima"
-                />
-                <Input
-                  type="number"
-                  value={filters.idadeMaxima}
-                  onChange={(e) => setFilters(prev => ({ ...prev, idadeMaxima: e.target.value }))}
-                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 text-sm h-9"
-                  placeholder="Idade máxima"
-                />
+                                 <Input
+                   type="number"
+                   value={filters.idadeMinima}
+                   onChange={(e) => setFilters(prev => ({ ...prev, idadeMinima: e.target.value }))}
+                   className="bg-black/30 border-white/30 text-white placeholder-gray-300 text-xs sm:text-sm h-8 sm:h-9 focus:border-yellow-400"
+                   placeholder="Idade mínima"
+                 />
+                 <Input
+                   type="number"
+                   value={filters.idadeMaxima}
+                   onChange={(e) => setFilters(prev => ({ ...prev, idadeMaxima: e.target.value }))}
+                   className="bg-black/30 border-white/30 text-white placeholder-gray-300 text-xs sm:text-sm h-8 sm:h-9 focus:border-yellow-400"
+                   placeholder="Idade máxima"
+                 />
               </div>
             </div>
 
             {/* Sexo e Status side by side */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {/* Sexo */}
-              <div className="space-y-2">
-                <label className="text-sm text-white">Sexo:</label>
+              <div className="space-y-1 sm:space-y-2">
+                <label className="text-xs sm:text-sm text-white">Sexo:</label>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id="masculino-compact"
                       checked={filters.sexos.includes('masculino')}
                       onCheckedChange={() => toggleSexo('masculino')}
-                      className="border-white/40 data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-4 h-4"
+                      className="border-white/40 data-[state=checked]:text-black data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
                     />
                     <label htmlFor="masculino-compact" className="text-white cursor-pointer text-xs">
                       Masculino
@@ -126,7 +126,7 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
                       id="feminino-compact"
                       checked={filters.sexos.includes('feminino')}
                       onCheckedChange={() => toggleSexo('feminino')}
-                      className="border-white/40 data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-4 h-4"
+                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
                     />
                     <label htmlFor="feminino-compact" className="text-white cursor-pointer text-xs">
                       Feminino
@@ -136,15 +136,15 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
               </div>
 
               {/* Status */}
-              <div className="space-y-2">
-                <label className="text-sm text-white">Status:</label>
+              <div className="space-y-1 sm:space-y-2">
+                <label className="text-xs sm:text-sm text-white">Status:</label>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id="desaparecido-compact"
                       checked={filters.status.includes('desaparecido')}
                       onCheckedChange={() => toggleStatus('desaparecido')}
-                      className="border-white/40 data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-4 h-4"
+                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
                     />
                     <label htmlFor="desaparecido-compact" className="text-white cursor-pointer text-xs">
                       Desaparecido
@@ -155,7 +155,7 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
                       id="localizado-compact"
                       checked={filters.status.includes('localizado')}
                       onCheckedChange={() => toggleStatus('localizado')}
-                      className="border-white/40 data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-4 h-4"
+                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
                     />
                     <label htmlFor="localizado-compact" className="text-white cursor-pointer text-xs">
                       Localizado
@@ -169,7 +169,7 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
             <div className="flex flex-col gap-2 pt-2">
               <Button
                 type="submit"
-                className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold text-sm h-9 w-full"
+                className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold text-xs sm:text-sm h-8 sm:h-9 w-full"
               >
                 <Search className="w-3 h-3 mr-2" />
                 BUSCAR
@@ -189,7 +189,7 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
     );
   }
 
-  // Original full-size form for other contexts
+  
   return (
     <div className="bg-black/80 backdrop-blur-sm rounded-lg overflow-hidden shadow-2xl font-encode-sans">
       {/* Header */}

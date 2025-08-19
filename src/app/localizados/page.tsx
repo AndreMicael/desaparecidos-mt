@@ -2,60 +2,32 @@
 
 import { useState, useEffect } from 'react';
 import { PersonCard } from '@/components/PersonCard';
-import { HeroSection } from '@/components/HeroSection';
 import { Button } from '@/components/ui/button';
-import { Person, SearchFilters } from '@/types/person';
+import { Person } from '@/types/person';
 import { toast } from 'sonner';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Toaster } from '@/components/ui/sonner';
 
-export default function Home() {
+export default function LocalizadosPage() {
   const [persons, setPersons] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [statistics, setStatistics] = useState({ total: 449, localizadas: 127 });
-  const [searchFilters, setSearchFilters] = useState<SearchFilters | null>(null);
   
   const pageSize = 12;
 
   useEffect(() => {
-    loadPersons();
-    loadStatistics();
-  }, [currentPage, searchFilters]);
+    loadLocalizados();
+  }, [currentPage]);
 
-  const loadPersons = async () => {
+  const loadLocalizados = async () => {
     try {
       setLoading(true);
       
-      // Construir URL com parâmetros de paginação e filtros
       const urlParams = new URLSearchParams({
         page: currentPage.toString(),
-        pageSize: pageSize.toString()
+        pageSize: pageSize.toString(),
+        status: 'localizado'
       });
-
-      // Adicionar filtros de busca se existirem
-      if (searchFilters) {
-        if (searchFilters.nome) {
-          urlParams.append('nome', searchFilters.nome);
-        }
-        if (searchFilters.idadeMinima) {
-          urlParams.append('idadeMinima', searchFilters.idadeMinima);
-        }
-        if (searchFilters.idadeMaxima) {
-          urlParams.append('idadeMaxima', searchFilters.idadeMaxima);
-        }
-        if (searchFilters.sexos.length > 0) {
-          searchFilters.sexos.forEach(sexo => {
-            urlParams.append('sexos', sexo);
-          });
-        }
-        if (searchFilters.status.length > 0) {
-          searchFilters.status.forEach(status => {
-            urlParams.append('status', status);
-          });
-        }
-      }
 
       const response = await fetch(`/api/pessoas?${urlParams.toString()}`);
       
@@ -67,36 +39,11 @@ export default function Home() {
       setPersons(result.data);
       setTotalPages(Math.ceil(result.total / pageSize));
     } catch (error) {
-      console.error('Erro ao carregar pessoas:', error);
-      toast.error('Erro ao carregar dados. Usando dados de exemplo.');
+      console.error('Erro ao carregar pessoas localizadas:', error);
+      toast.error('Erro ao carregar dados.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const loadStatistics = async () => {
-    try {
-      const response = await fetch('/api/estatisticas');
-      
-      if (!response.ok) {
-        throw new Error(`Erro na API: ${response.status}`);
-      }
-
-      const stats = await response.json();
-      setStatistics(stats);
-    } catch (error) {
-      console.error('Erro ao carregar estatísticas:', error);
-    }
-  };
-
-  const handleSearch = (filters: SearchFilters) => {
-    setSearchFilters(filters);
-    setCurrentPage(1);
-  };
-
-  const handleClearSearch = () => {
-    setSearchFilters(null);
-    setCurrentPage(1);
   };
 
   const nextPage = () => {
@@ -111,30 +58,29 @@ export default function Home() {
     }
   };
 
-  const handlePersonClick = (person: Person) => {
-    // Aqui você pode implementar a navegação para a página de detalhes
-    console.log('Pessoa selecionada:', person);
-  };
-
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section with integrated search */}
-      <HeroSection 
-        totalPessoas={statistics.total}
-        pessoasLocalizadas={statistics.localizadas}
-        onSearch={handleSearch}
-        onClear={handleClearSearch}
-      />
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 py-16">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
+            PESSOAS LOCALIZADAS
+          </h1>
+          <p className="text-xl text-black/80 max-w-2xl mx-auto">
+            Pessoas que foram localizadas com sucesso pela Polícia Civil de Mato Grosso
+          </p>
+        </div>
+      </div>
 
-      {/* Results Section - Fundo Branco */}
-      <div className="bg-white py-12 font-encode-sans">
+      {/* Results Section */}
+      <div className="py-12 font-encode-sans">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-black mb-2">
-              Pessoas Desaparecidas
+              Pessoas Localizadas
             </h2>
             <p className="text-gray-700">
-              Se você tem informações sobre alguma dessas pessoas, entre em contato conosco.
+              Pessoas que foram localizadas com sucesso e retornaram para suas famílias.
             </p>
           </div>
 
@@ -154,7 +100,10 @@ export default function Home() {
                   <PersonCard
                     key={person.id}
                     person={person}
-                    onClick={() => handlePersonClick(person)}
+                    onClick={() => {
+                      // Aqui você pode implementar a navegação para a página de detalhes
+                      console.log('Pessoa selecionada:', person);
+                    }}
                   />
                 ))}
               </div>
@@ -194,19 +143,12 @@ export default function Home() {
           {!loading && persons.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-600 text-lg mb-4">
-                Nenhuma pessoa encontrada com os filtros aplicados.
+                Nenhuma pessoa localizada encontrada.
               </p>
-              <Button
-                onClick={handleClearSearch}
-                className="bg-yellow-400 text-black hover:bg-yellow-500 border-2 border-yellow-400"
-              >
-                Limpar filtros
-              </Button>
             </div>
           )}
         </div>
       </div>
-      <Toaster position="top-right" />
     </div>
   );
 }

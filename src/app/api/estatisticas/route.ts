@@ -8,32 +8,44 @@ interface Statistics {
 
 export async function GET() {
   try {
-    // Fazer uma requisição para obter estatísticas (primeira página com tamanho grande)
-    const url = 'https://abitus-api.geia.vip/v1/pessoas/aberto/filtro';
-    
-    const response = await fetch(url, {
+    // Buscar total de pessoas (todas)
+    const totalUrl = 'https://abitus-api.geia.vip/v1/pessoas/aberto/filtro?pagina=0&porPagina=1';
+    const totalResponse = await fetch(totalUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`Erro na API externa: ${response.status} ${response.statusText}`);
+    if (!totalResponse.ok) {
+      throw new Error(`Erro na API externa: ${totalResponse.status} ${totalResponse.statusText}`);
     }
 
-    const data: AbitusResponse = await response.json();
-    
-    // Mapear os dados para calcular estatísticas
-    const allPersons = data.content.map(mapAbitusPersonToPerson);
-    
-    const total = data.totalElements;
-    const localizadas = allPersons.filter(person => person.localizado).length;
+    const totalData: AbitusResponse = await totalResponse.json();
+    const totalElements = totalData.totalElements;
+
+    // Buscar pessoas localizadas usando o parâmetro status=LOCALIZADO
+    const localizadasUrl = 'https://abitus-api.geia.vip/v1/pessoas/aberto/filtro?pagina=0&porPagina=1&status=LOCALIZADO';
+    const localizadasResponse = await fetch(localizadasUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!localizadasResponse.ok) {
+      throw new Error(`Erro na API externa (localizadas): ${localizadasResponse.status} ${localizadasResponse.statusText}`);
+    }
+
+    const localizadasData: AbitusResponse = await localizadasResponse.json();
+    const localizadas = localizadasData.totalElements;
     
     const statistics: Statistics = {
-      total,
+      total: totalElements,
       localizadas
     };
+
+    console.log(`Estatísticas calculadas: ${totalElements} total, ${localizadas} localizadas`);
 
     return NextResponse.json(statistics);
   } catch (error) {

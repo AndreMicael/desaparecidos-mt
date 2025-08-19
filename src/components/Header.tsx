@@ -1,13 +1,19 @@
 "use client";
 
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Phone, Mail, Instagram, Facebook } from 'lucide-react';
 
-interface HeaderProps {
-  activeTab?: 'desaparecidos' | 'localizados' | 'como-ajudar' | 'contato';
-  onTabChange?: (tab: 'desaparecidos' | 'localizados' | 'como-ajudar' | 'contato') => void;
-}
+export function Header() {
+  const pathname = usePathname();
 
-export function Header({ activeTab = 'desaparecidos', onTabChange }: HeaderProps) {
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return pathname === '/';
+    }
+    return pathname.startsWith(path);
+  };
+
   return (
     <div className="bg-black text-white font-encode-sans">
       {/* Top contact bar */}
@@ -27,15 +33,30 @@ export function Header({ activeTab = 'desaparecidos', onTabChange }: HeaderProps
             <div className="flex items-center gap-4">
               <span>Redes Sociais:</span>
               <div className="flex gap-2">
-                <div className="w-6 h-6 bg-yellow-400 border border-black rounded flex items-center justify-center">
+                <a 
+                  href="https://instagram.com/policiacivilmt" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-6 h-6 bg-yellow-400 border border-black rounded flex items-center justify-center hover:bg-yellow-300 transition-colors"
+                >
                   <Instagram className="w-3 h-3 text-black" />
-                </div>
-                <div className="w-6 h-6 bg-yellow-400 border border-black rounded flex items-center justify-center">
+                </a>
+                <a 
+                  href="https://facebook.com/policiacivilmt" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-6 h-6 bg-yellow-400 border border-black rounded flex items-center justify-center hover:bg-yellow-300 transition-colors"
+                >
                   <Facebook className="w-3 h-3 text-black" />
-                </div>
-                <div className="w-6 h-6 bg-yellow-400 border border-black rounded flex items-center justify-center text-black text-xs font-bold">
+                </a>
+                <a 
+                  href="https://x.com/policiacivilmt" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-6 h-6 bg-yellow-400 border border-black rounded flex items-center justify-center text-black text-xs font-bold hover:bg-yellow-300 transition-colors"
+                >
                   X
-                </div>
+                </a>
               </div>
             </div>
           </div>
@@ -46,7 +67,7 @@ export function Header({ activeTab = 'desaparecidos', onTabChange }: HeaderProps
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo and title */}
-          <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-4 hover:opacity-90 transition-opacity">
             <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center">
               <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">POLÍCIA</span>
@@ -56,50 +77,50 @@ export function Header({ activeTab = 'desaparecidos', onTabChange }: HeaderProps
               <h1 className="text-xl font-bold">POLÍCIA CIVIL</h1>
               <p className="text-sm text-gray-300">ESTADO DE MATO GROSSO</p>
             </div>
-          </div>
+          </Link>
 
           {/* Navigation */}
           <nav className="flex gap-8">
-            <button
-              onClick={() => onTabChange?.('desaparecidos')}
+            <Link
+              href="/"
               className={`px-4 py-2 transition-colors font-medium ${
-                activeTab === 'desaparecidos'
+                isActive('/')
                   ? 'text-yellow-400 border-b-2 border-yellow-400'
                   : 'text-white hover:text-yellow-400'
               }`}
             >
               Desaparecidos
-            </button>
-            <button
-              onClick={() => onTabChange?.('localizados')}
+            </Link>
+            <Link
+              href="/localizados"
               className={`px-4 py-2 transition-colors font-medium ${
-                activeTab === 'localizados'
+                isActive('/localizados')
                   ? 'text-yellow-400 border-b-2 border-yellow-400'
                   : 'text-white hover:text-yellow-400'
               }`}
             >
               Localizados
-            </button>
-            <button
-              onClick={() => onTabChange?.('como-ajudar')}
+            </Link>
+            <Link
+              href="/como-ajudar"
               className={`px-4 py-2 transition-colors font-medium ${
-                activeTab === 'como-ajudar'
+                isActive('/como-ajudar')
                   ? 'text-yellow-400 border-b-2 border-yellow-400'
                   : 'text-white hover:text-yellow-400'
               }`}
             >
               Como Ajudar
-            </button>
-            <button
-              onClick={() => onTabChange?.('contato')}
+            </Link>
+            <Link
+              href="/contato"
               className={`px-4 py-2 transition-colors font-medium ${
-                activeTab === 'contato'
+                isActive('/contato')
                   ? 'text-yellow-400 border-b-2 border-yellow-400'
                   : 'text-white hover:text-yellow-400'
               }`}
             >
               Contato
-            </button>
+            </Link>
           </nav>
         </div>
       </div>

@@ -34,11 +34,34 @@ export function HomePage({ onPersonClick }: HomePageProps) {
     try {
       setLoading(true);
       
-      // Construir URL com parâmetros de paginação apenas
+      // Construir URL com parâmetros de paginação e filtros
       const urlParams = new URLSearchParams({
         page: currentPage.toString(),
         pageSize: pageSize.toString()
       });
+
+      // Adicionar filtros de busca se existirem
+      if (searchFilters) {
+        if (searchFilters.nome) {
+          urlParams.append('nome', searchFilters.nome);
+        }
+        if (searchFilters.idadeMinima) {
+          urlParams.append('idadeMinima', searchFilters.idadeMinima);
+        }
+        if (searchFilters.idadeMaxima) {
+          urlParams.append('idadeMaxima', searchFilters.idadeMaxima);
+        }
+        if (searchFilters.sexos.length > 0) {
+          searchFilters.sexos.forEach(sexo => {
+            urlParams.append('sexos', sexo);
+          });
+        }
+        if (searchFilters.status.length > 0) {
+          searchFilters.status.forEach(status => {
+            urlParams.append('status', status);
+          });
+        }
+      }
 
       const response = await fetch(`/api/pessoas?${urlParams.toString()}`);
       
@@ -108,7 +131,7 @@ export function HomePage({ onPersonClick }: HomePageProps) {
               onClear={handleClearSearch}
             />
 
-            {/* Results Section - Fundo Branco */}
+            {/* Seção de Resultados - Fundo Branco */}
             <div className="bg-white py-12 font-encode-sans">
               <div className="max-w-7xl mx-auto px-4">
                 <div className="mb-8">
@@ -196,34 +219,34 @@ export function HomePage({ onPersonClick }: HomePageProps) {
 
       case 'como-ajudar':
         return (
-          <div className="bg-black text-white py-16 font-encode-sans">
+          <div className="bg-white text-white py-16 font-encode-sans">
             <div className="max-w-4xl mx-auto px-4">
-              <h1 className="text-3xl font-bold text-yellow-400 mb-8">Como Ajudar</h1>
+              <h1 className="text-3xl font-bold text-slate-900 mb-8">Como Ajudar</h1>
               
               <div className="space-y-8">
-                <div className="bg-gray-900 p-6 rounded-lg">
-                  <h2 className="text-xl font-bold text-yellow-400 mb-4">Relatando Informações</h2>
-                  <p className="text-gray-300 mb-4">
+                <div className="border-2 border-slate-200 p-6 rounded-lg">
+                  <h2 className="text-xl font-bold text-slate-900 mb-4">Relatando Informações</h2>
+                  <p className="text-slate-800 mb-4">
                     Se você tem informações sobre uma pessoa desaparecida, entre em contato conosco imediatamente:
                   </p>
-                  <ul className="list-disc list-inside text-gray-300 space-y-2">
+                  <ul className="list-disc list-inside text-slate-800 space-y-2">
                     <li>Telefone: (65) 3648-5100</li>
                     <li>Email: atendimento@policiacivil.gov.br</li>
                     <li>Presencialmente em qualquer delegacia</li>
                   </ul>
                 </div>
 
-                <div className="bg-gray-900 p-6 rounded-lg">
-                  <h2 className="text-xl font-bold text-yellow-400 mb-4">Compartilhando</h2>
-                  <p className="text-gray-300">
+                <div className="border-2 border-slate-200 p-6 rounded-lg">
+                  <h2 className="text-xl font-bold text-slate-900 mb-4">Compartilhando</h2>
+                  <p className="text-slate-800">
                     Compartilhe as informações sobre pessoas desaparecidas em suas redes sociais. 
                     Sua divulgação pode ser fundamental para reunir famílias.
                   </p>
                 </div>
 
-                <div className="bg-gray-900 p-6 rounded-lg">
-                  <h2 className="text-xl font-bold text-yellow-400 mb-4">Sendo Voluntário</h2>
-                  <p className="text-gray-300">
+                <div className="border-2 border-slate-200 p-6 rounded-lg">
+                  <h2 className="text-xl font-bold text-slate-900 mb-4">Sendo Voluntário</h2>
+                  <p className="text-slate-800">
                     Participe de grupos de busca organizados e ajude na divulgação de casos. 
                     Entre em contato conosco para saber como se voluntariar.
                   </p>
@@ -235,23 +258,23 @@ export function HomePage({ onPersonClick }: HomePageProps) {
 
       case 'contato':
         return (
-          <div className="bg-black text-white py-16 font-encode-sans">
+          <div className="bg-white text-slate-900 py-16 font-encode-sans">
             <div className="max-w-4xl mx-auto px-4">
-              <h1 className="text-3xl font-bold text-yellow-400 mb-8">Contato</h1>
+              <h1 className="text-3xl font-bold text-slate-900 mb-8">Contato</h1>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-gray-900 p-6 rounded-lg">
-                  <h2 className="text-xl font-bold text-yellow-400 mb-4">Central de Atendimento</h2>
-                  <div className="space-y-2 text-gray-300">
+                <div className="border-2 border-slate-200 p-6 rounded-lg">
+                  <h2 className="text-xl font-bold text-slate-900 mb-4">Central de Atendimento</h2>
+                  <div className="space-y-2 text-slate-800">
                     <p><strong className="text-white">Telefone:</strong> (65) 3648-5100</p>
                     <p><strong className="text-white">Email:</strong> atendimento@policiacivil.gov.br</p>
                     <p><strong className="text-white">Horário:</strong> 24 horas</p>
                   </div>
                 </div>
 
-                <div className="bg-gray-900 p-6 rounded-lg">
-                  <h2 className="text-xl font-bold text-yellow-400 mb-4">Endereço</h2>
-                  <div className="text-gray-300 space-y-1">
+                <div className="border-2 border-slate-200 p-6 rounded-lg">
+                  <h2 className="text-xl font-bold text-slate-900 mb-4">Endereço</h2>
+                  <div className="text-slate-800 space-y-1">
                     <p>Polícia Civil do Estado de Mato Grosso</p>
                     <p>Unidade de Pessoas Desaparecidas</p>
                     <p>Cuiabá - MT</p>
@@ -259,9 +282,9 @@ export function HomePage({ onPersonClick }: HomePageProps) {
                 </div>
               </div>
 
-              <div className="mt-8 bg-gray-900 p-6 rounded-lg">
-                <h2 className="text-xl font-bold text-yellow-400 mb-4">Redes Sociais</h2>
-                <p className="text-gray-300">
+                <div className="mt-8 border-2 border-slate-200 p-6 rounded-lg">
+                <h2 className="text-xl font-bold text-slate-900 mb-4">Redes Sociais</h2>
+                <p className="text-slate-800">
                   Siga-nos nas redes sociais para acompanhar atualizações e informações importantes.
                 </p>
               </div>
@@ -276,9 +299,8 @@ export function HomePage({ onPersonClick }: HomePageProps) {
 
   return (
     <div className="min-h-screen bg-white font-encode-sans">
-      <Header activeTab={activeTab} onTabChange={setActiveTab} />
-      {renderContent()}
-      <Footer />
+     <HeroSection onSearch={() => {}} onClear={() => {}} />
+     
     </div>
   );
 }

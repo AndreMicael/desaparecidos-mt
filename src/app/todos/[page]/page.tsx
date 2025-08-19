@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Person, SearchFilters } from '@/types/person';
 import { toast } from 'sonner';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Toaster } from '@/components/ui/sonner';
 
-export default function Home() {
+export default function DesaparecidosPage() {
+  const params = useParams();
   const router = useRouter();
   const resultsRef = useRef<HTMLDivElement>(null);
   const [persons, setPersons] = useState<Person[]>([]);
@@ -20,12 +21,23 @@ export default function Home() {
   const [searchFilters, setSearchFilters] = useState<SearchFilters | null>(null);
   
   const pageSize = 12;
-  const currentPage = 1; // Sempre página 1 para a rota principal
+  const currentPage = parseInt(params.page as string) || 1;
+  const isFirstPage = currentPage === 1;
 
   useEffect(() => {
     loadPersons();
     loadStatistics();
-  }, [searchFilters]);
+  }, [currentPage, searchFilters]);
+
+  useEffect(() => {
+    // Scroll para a seção de resultados quando a página carregar
+    if (!loading && resultsRef.current) {
+      resultsRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }, [loading, persons]);
 
   const loadPersons = async () => {
     try {
@@ -94,10 +106,18 @@ export default function Home() {
 
   const handleSearch = (filters: SearchFilters) => {
     setSearchFilters(filters);
+    // Redirecionar para página 1 quando fizer busca
+    if (currentPage !== 1) {
+      router.push('/');
+    }
   };
 
   const handleClearSearch = () => {
     setSearchFilters(null);
+    // Redirecionar para página 1 quando limpar busca
+    if (currentPage !== 1) {
+      router.push('/');
+    }
   };
 
   const navigateToPage = (page: number) => {
@@ -115,25 +135,45 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section with integrated search */}
-      <HeroSection 
-        totalPessoas={statistics.total}
-        pessoasLocalizadas={statistics.localizadas}
-        onSearch={handleSearch}
-        onClear={handleClearSearch}
-      />
+      {/* Hero Section - Apenas na primeira página */}
+      {isFirstPage && (
+        <HeroSection 
+          totalPessoas={statistics.total}
+          pessoasLocalizadas={statistics.localizadas}
+          onSearch={handleSearch}
+          onClear={handleClearSearch}
+        />
+      )}
 
       {/* Results Section - Fundo Branco */}
-      <div ref={resultsRef} className="bg-white py-12 font-encode-sans">
+      <div ref={resultsRef} className={`font-encode-sans ${isFirstPage ? 'bg-white py-12' : 'bg-white py-8'}`}>
         <div className="max-w-7xl mx-auto px-4">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-2">
-              Pessoas Desaparecidas
-            </h2>
-            <p className="text-gray-700">
-              Se você tem informações sobre alguma dessas pessoas, entre em contato conosco.
-            </p>
-          </div>
+          {/* Header da seção - Apenas nas páginas 2+ */}
+          {!isFirstPage && (
+            <div className="mb-8">
+              <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">
+                Pessoas Desaparecidas
+              </h1>
+              <p className="text-gray-700">
+                Se você tem informações sobre alguma dessas pessoas, entre em contato conosco.
+              </p>
+              <div className="mt-4 text-sm text-gray-500">
+                Página {currentPage} de {totalPages}
+              </div>
+            </div>
+          )}
+
+          {/* Header da seção - Apenas na primeira página */}
+          {isFirstPage && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-black mb-2">
+                Pessoas Desaparecidas
+              </h2>
+              <p className="text-gray-700">
+                Se você tem informações sobre alguma dessas pessoas, entre em contato conosco.
+              </p>
+            </div>
+          )}
 
           {/* Loading */}
           {loading && (

@@ -1,23 +1,36 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PersonCard } from '@/components/PersonCard';
 import { Button } from '@/components/ui/button';
 import { Person } from '@/types/person';
 import { toast } from 'sonner';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function LocalizadosPage() {
+  const router = useRouter();
+  const resultsRef = useRef<HTMLDivElement>(null);
   const [persons, setPersons] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   
   const pageSize = 12;
+  const currentPage = 1; // Sempre página 1 para a rota principal
 
   useEffect(() => {
     loadLocalizados();
-  }, [currentPage]);
+  }, []);
+
+  useEffect(() => {
+    // Scroll para a seção de resultados quando a página carregar
+    if (!loading && resultsRef.current) {
+      resultsRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }, [loading, persons]);
 
   const loadLocalizados = async () => {
     try {
@@ -46,15 +59,11 @@ export default function LocalizadosPage() {
     }
   };
 
-  const nextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const prevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+  const navigateToPage = (page: number) => {
+    if (page === 1) {
+      router.push('/localizados');
+    } else {
+      router.push(`/localizados/${page}`);
     }
   };
 
@@ -73,7 +82,7 @@ export default function LocalizadosPage() {
       </div>
 
       {/* Results Section */}
-      <div className="py-12 font-encode-sans">
+      <div ref={resultsRef} className="py-12 font-encode-sans">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-black mb-2">
@@ -112,7 +121,7 @@ export default function LocalizadosPage() {
               {totalPages > 1 && (
                 <div className="flex justify-center items-center gap-4">
                   <Button
-                    onClick={prevPage}
+                    onClick={() => navigateToPage(currentPage - 1)}
                     disabled={currentPage === 1}
                     variant="outline"
                     className="flex items-center gap-2 bg-white border-2 border-black text-black hover:bg-black hover:text-white"
@@ -126,7 +135,7 @@ export default function LocalizadosPage() {
                   </span>
                   
                   <Button
-                    onClick={nextPage}
+                    onClick={() => navigateToPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
                     variant="outline"
                     className="flex items-center gap-2 bg-white border-2 border-black text-black hover:bg-black hover:text-white"

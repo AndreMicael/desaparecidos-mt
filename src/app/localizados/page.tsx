@@ -1,12 +1,24 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { PersonCard } from '@/components/PersonCard';
-import { Button } from '@/components/ui/button';
+import dynamic from 'next/dynamic';
 import { Person } from '@/types/person';
 import { toast } from 'sonner';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+
+// Lazy loading dos componentes
+const PersonCard = dynamic(() => import('@/components/PersonCard').then(mod => ({ default: mod.PersonCard })), {
+  ssr: false
+});
+
+const Button = dynamic(() => import('@/components/ui/button').then(mod => ({ default: mod.Button })), {
+  ssr: false
+});
+
+const PersonCardGridSkeleton = dynamic(() => import('@/components/PersonCardGridSkeleton').then(mod => ({ default: mod.PersonCardGridSkeleton })), {
+  ssr: false
+});
 
 export default function LocalizadosPage() {
   const router = useRouter();
@@ -94,12 +106,7 @@ export default function LocalizadosPage() {
           </div>
 
           {/* Loading */}
-          {loading && (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-yellow-500" />
-              <span className="ml-2 text-gray-600">Carregando...</span>
-            </div>
-          )}
+          {loading && <PersonCardGridSkeleton />}
 
           {/* Results Grid */}
           {!loading && persons.length > 0 && (
@@ -109,10 +116,6 @@ export default function LocalizadosPage() {
                   <PersonCard
                     key={person.id}
                     person={person}
-                    onClick={() => {
-                      // Aqui você pode implementar a navegação para a página de detalhes
-                      console.log('Pessoa selecionada:', person);
-                    }}
                   />
                 ))}
               </div>

@@ -2,9 +2,17 @@
 
 import { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, Send, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
+
+// Lazy loading dos componentes
+const Button = dynamic(() => import('@/components/ui/button').then(mod => ({ default: mod.Button })), {
+  ssr: false
+});
+
+const Input = dynamic(() => import('@/components/ui/input').then(mod => ({ default: mod.Input })), {
+  ssr: false
+});
 
 export default function ContatoPage() {
   const [formData, setFormData] = useState({

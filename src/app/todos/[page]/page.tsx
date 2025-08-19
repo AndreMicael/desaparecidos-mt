@@ -1,14 +1,38 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { PersonCard } from '@/components/PersonCard';
-import { HeroSection } from '@/components/HeroSection';
-import { Button } from '@/components/ui/button';
+import dynamic from 'next/dynamic';
 import { Person, SearchFilters } from '@/types/person';
 import { toast } from 'sonner';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { Toaster } from '@/components/ui/sonner';
+
+// Lazy loading dos componentes
+const PersonCard = dynamic(() => import('@/components/PersonCard').then(mod => ({ default: mod.PersonCard })), {
+  ssr: false
+});
+
+const Button = dynamic(() => import('@/components/ui/button').then(mod => ({ default: mod.Button })), {
+  ssr: false
+});
+
+const Toaster = dynamic(() => import('@/components/ui/sonner').then(mod => ({ default: mod.Toaster })), {
+  ssr: false
+});
+
+const HeroSectionSkeleton = dynamic(() => import('@/components/HeroSectionSkeleton').then(mod => ({ default: mod.HeroSectionSkeleton })), {
+  ssr: false
+});
+
+const PersonCardGridSkeleton = dynamic(() => import('@/components/PersonCardGridSkeleton').then(mod => ({ default: mod.PersonCardGridSkeleton })), {
+  ssr: false
+});
+
+// Lazy loading do HeroSection
+const HeroSection = dynamic(() => import('@/components/HeroSection').then(mod => ({ default: mod.HeroSection })), {
+  loading: () => <HeroSectionSkeleton />,
+  ssr: false
+});
 
 export default function DesaparecidosPage() {
   const params = useParams();
@@ -17,7 +41,7 @@ export default function DesaparecidosPage() {
   const [persons, setPersons] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
-  const [statistics, setStatistics] = useState({ total: 449, localizadas: 127 });
+  const [statistics, setStatistics] = useState({ total: 449, localizadas: 23 });
   const [searchFilters, setSearchFilters] = useState<SearchFilters | null>(null);
   
   const pageSize = 12;
@@ -128,10 +152,7 @@ export default function DesaparecidosPage() {
     }
   };
 
-  const handlePersonClick = (person: Person) => {
-    // Aqui você pode implementar a navegação para a página de detalhes
-    console.log('Pessoa selecionada:', person);
-  };
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -176,12 +197,7 @@ export default function DesaparecidosPage() {
           )}
 
           {/* Loading */}
-          {loading && (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-yellow-500" />
-              <span className="ml-2 text-gray-600">Carregando...</span>
-            </div>
-          )}
+          {loading && <PersonCardGridSkeleton />}
 
           {/* Results Grid */}
           {!loading && persons.length > 0 && (
@@ -191,7 +207,6 @@ export default function DesaparecidosPage() {
                   <PersonCard
                     key={person.id}
                     person={person}
-                    onClick={() => handlePersonClick(person)}
                   />
                 ))}
               </div>

@@ -1,5 +1,8 @@
 "use client";
 
+import LogoPJC from '../../public/logo_pjc.svg';
+import Image from 'next/image';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Phone, Mail, Instagram, Facebook } from 'lucide-react';
@@ -68,13 +71,9 @@ export function Header() {
         <div className="flex items-center justify-between">
           {/* Logo and title */}
           <Link href="/" className="flex items-center gap-4 hover:opacity-90 transition-opacity">
-            <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center">
-              <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">POLÍCIA</span>
-              </div>
-            </div>
+            <Image src={LogoPJC} alt="Logo" width={50} height={50} />
             <div>
-              <h1 className="text-xl font-bold">POLÍCIA CIVIL</h1>
+              <h1 className="text-xl font-bold">POLÍCIA JUDICIÁRIA CIVIL</h1>
               <p className="text-sm text-gray-300">ESTADO DE MATO GROSSO</p>
             </div>
           </Link>

@@ -3,14 +3,18 @@
 import { Calendar, MapPin, User, Clock } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
+import { ImageWithFallback } from './ui/image-with-fallback';
 import { Person } from '@/types/person';
+import { useRouter } from 'next/navigation';
 
 interface PersonCardProps {
   person: Person;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export function PersonCard({ person, onClick }: PersonCardProps) {
+  const router = useRouter();
+
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Data não informada';
     
@@ -42,27 +46,37 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
   };
 
   // Usar idade da API se disponível, senão calcular pela data de nascimento
-  const age = person.idade || calculateAge(person.dtNascimento);
+  const age = person.idade || (person.dtNascimento ? calculateAge(person.dtNascimento) : null);
+
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      // Navegar para a página individual da pessoa
+      const personId = person.id as number;
+      const route = person.localizado 
+        ? `/localizados/pessoa/${personId}`
+        : `/desaparecidos/pessoa/${personId}`;
+      
+      router.push(route);
+    }
+  };
 
   return (
     <Card 
       className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-2 border-gray-200 hover:border-yellow-400 bg-white text-black overflow-hidden font-encode-sans"
-      onClick={onClick}
+      onClick={handleCardClick}
     >
       <CardContent className="p-0">
         {/* Image */}
-        <div className="aspect-square overflow-hidden bg-gray-100 relative">
-          {person.foto ? (
-            <img
-              src={person.foto}
-              alt={`Foto de ${person.nome}`}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100">
-              <User className="w-16 h-16 text-gray-400" />
-            </div>
-          )}
+        <div className="aspect-square overflow-hidden bg-gray-100">
+          <ImageWithFallback
+            src={person.foto}
+            alt={`Foto de ${person.nome}`}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            containerClassName="w-full h-full"
+            placeholder={<User className="w-16 h-16 text-gray-400" />}
+          />
           {/* Status badge overlay */}
           <div className="absolute top-3 right-3">
             <Badge 

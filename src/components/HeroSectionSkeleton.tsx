@@ -1,22 +1,6 @@
-"use client";
+import { Skeleton } from '@/components/ui/skeleton';
 
-import { User, Check } from 'lucide-react';
-import { SearchForm } from './SearchForm';
-import { SearchFilters } from '@/types/person';
-
-interface HeroSectionProps {
-  totalPessoas?: number;
-  pessoasLocalizadas?: number;
-  onSearch: (filters: SearchFilters) => void;
-  onClear: () => void;
-}
-
-export function HeroSection({ 
-  totalPessoas = 449, 
-  pessoasLocalizadas = 23, 
-  onSearch, 
-  onClear 
-}: HeroSectionProps) {
+export function HeroSectionSkeleton() {
   return (
     <div className="relative min-h-[400px] md:min-h-[500px] lg:min-h-[600px] font-encode-sans overflow-hidden">
       {/* Background com espelhamento */}
@@ -36,13 +20,9 @@ export function HeroSection({
           {/* Left side - Title, subtitle and stats cards */}
           <div className="lg:col-span-7 space-y-6 md:space-y-8">
             {/* Title and subtitle */}
-            <div className="text-white text-center lg:text-left">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 text-white leading-tight">
-                UNIDADE DE PESSOAS DESAPARECIDAS
-              </h1>
-              <p className="text-base sm:text-lg md:text-xl text-gray-200">
-                Sua ajuda pode fazer a diferença
-              </p>
+            <div className="text-white text-center lg:text-left space-y-4">
+              <Skeleton className="h-8 md:h-10 lg:h-12 w-3/4 md:w-2/3 lg:w-4/5 mx-auto lg:mx-0 bg-white/20" />
+              <Skeleton className="h-4 md:h-5 lg:h-6 w-1/2 md:w-1/3 lg:w-2/5 mx-auto lg:mx-0 bg-white/20" />
             </div>
 
             {/* Statistics cards */}
@@ -50,23 +30,19 @@ export function HeroSection({
               {/* Pessoas Cadastradas */}
               <div className="bg-black/70 backdrop-blur-sm rounded-lg p-4 md:p-6 text-center text-white flex-1 sm:flex-none sm:min-w-[160px] md:min-w-[180px] border border-white/20">
                 <div className="flex justify-center mb-3">
-                  <div className="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                  </div>
+                  <Skeleton className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/20" />
                 </div>
-                <div className="text-xl md:text-2xl font-bold mb-1 text-white">{totalPessoas}</div>
-                <div className="text-xs text-gray-300 text-white">PESSOAS CADASTRADAS</div>
+                <Skeleton className="h-6 md:h-8 w-16 md:w-20 mx-auto mb-2 bg-white/20" />
+                <Skeleton className="h-3 md:h-4 w-24 md:w-28 mx-auto bg-white/20" />
               </div>
 
               {/* Pessoas Localizadas */}
               <div className="bg-black/70 backdrop-blur-sm rounded-lg p-4 md:p-6 text-center text-white flex-1 sm:flex-none sm:min-w-[160px] md:min-w-[180px] border border-white/20">
                 <div className="flex justify-center mb-3">
-                  <div className="w-8 h-8 md:w-10 md:h-10 bg-green-600 rounded-full flex items-center justify-center">
-                    <Check className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                  </div>
+                  <Skeleton className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/20" />
                 </div>
-                <div className="text-xl md:text-2xl font-bold mb-1 text-white">{pessoasLocalizadas}</div>
-                <div className="text-xs text-gray-300 text-white">PESSOAS LOCALIZADAS</div>
+                <Skeleton className="h-6 md:h-8 w-16 md:w-20 mx-auto mb-2 bg-white/20" />
+                <Skeleton className="h-3 md:h-4 w-24 md:w-28 mx-auto bg-white/20" />
               </div>
             </div>
           </div>
@@ -74,7 +50,23 @@ export function HeroSection({
           {/* Right side - Compact search form */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end">
             <div className="w-full max-w-sm lg:max-w-md">
-              <SearchForm onSearch={onSearch} onClear={onClear} compact />
+              <div className="bg-black/30 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl w-full max-w-sm font-encode-sans border border-white/20 p-6">
+                <div className="space-y-4">
+                  <Skeleton className="h-4 w-24 bg-white/20" />
+                  <Skeleton className="h-10 w-full bg-white/20" />
+                  <Skeleton className="h-4 w-32 bg-white/20" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <Skeleton className="h-10 bg-white/20" />
+                    <Skeleton className="h-10 bg-white/20" />
+                  </div>
+                  <Skeleton className="h-4 w-28 bg-white/20" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full bg-white/20" />
+                    <Skeleton className="h-4 w-3/4 bg-white/20" />
+                  </div>
+                  <Skeleton className="h-10 w-full bg-white/20" />
+                </div>
+              </div>
             </div>
           </div>
         </div>

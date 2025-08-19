@@ -20,7 +20,7 @@ export function HomePage({ onPersonClick }: HomePageProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [activeTab, setActiveTab] = useState<'desaparecidos' | 'localizados' | 'como-ajudar' | 'contato'>('desaparecidos');
-  const [statistics, setStatistics] = useState({ total: 449, localizadas: 127 });
+  const [statistics, setStatistics] = useState({ total: 449, localizadas: 23 });
   const [searchFilters, setSearchFilters] = useState<SearchFilters | null>(null);
   
   const pageSize = 12;

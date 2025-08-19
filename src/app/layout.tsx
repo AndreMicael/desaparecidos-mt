@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
 import { Encode_Sans } from "next/font/google";
 import "./globals.css";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
+import dynamic from "next/dynamic";
+
+// Lazy loading dos componentes do layout
+const Header = dynamic(() => import("@/components/Header").then(mod => ({ default: mod.Header })), {
+  ssr: true
+});
+
+const Footer = dynamic(() => import("@/components/Footer").then(mod => ({ default: mod.Footer })), {
+  ssr: true
+});
 
 const encodeSans = Encode_Sans({
   subsets: ["latin"],

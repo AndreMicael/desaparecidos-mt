@@ -1,11 +1,12 @@
 "use client";
 
-import { Calendar, MapPin, User, Clock } from 'lucide-react';
+import { Calendar, MapPin, User, Clock, UserCheck, UserX } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './ui/image-with-fallback';
 import { Person } from '@/types/person';
 import { useRouter } from 'next/navigation';
+import { GenderMale, GenderFemale } from '@phosphor-icons/react';
 
 interface PersonCardProps {
   person: Person;
@@ -69,7 +70,7 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
     >
       <CardContent className="p-0">
         {/* Image */}
-        <div className="aspect-square overflow-hidden bg-gray-100">
+        <div className="relative aspect-square overflow-hidden bg-gray-100">
           <ImageWithFallback
             src={person.foto}
             alt={`Foto de ${person.nome}`}
@@ -78,11 +79,11 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
             placeholder={<User className="w-16 h-16 text-gray-400" />}
           />
           {/* Status badge overlay */}
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-3 right-3 z-10">
             <Badge 
               variant={person.localizado ? "default" : "destructive"}
               className={person.localizado 
-                ? "bg-yellow-400 text-black hover:bg-yellow-500 border-none font-medium" 
+                ? "bg-green-500 text-black hover:bg-green-500 border-none font-medium" 
                 : "bg-red-600 text-white hover:bg-red-700 border-none font-medium"
               }
             >
@@ -95,17 +96,17 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
         <div className="p-4 space-y-3 bg-white">
           {/* Header */}
           <div className="space-y-2">
-            <h3 className="font-bold text-black line-clamp-1 text-lg">
+            <h3 className="font-bold text-gray-700 line-clamp-1 text-lg">
               {person.nome}
             </h3>
             <div className="flex items-center justify-between">
               {age && (
-                <span className="text-sm text-black font-medium bg-yellow-100 px-2 py-1 rounded">
+                <span className="text-sm text-white font-medium bg-gray-500 bg-opacity-20 px-2 py-1 rounded">
                   {age} anos
                 </span>
               )}
               <span className="text-xs text-gray-600 uppercase tracking-wide font-medium">
-                {person.sexo}
+                {person.sexo === 'masculino' ? <p className='flex gap-2'><GenderMale  className="w-4 h-4" /> Masculino</p>: <p className='flex gap-2'><GenderFemale  className="w-4 h-4" /> Feminino</p>}
               </span>
             </div>
           </div>
@@ -136,7 +137,7 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
 
           {/* Footer */}
           <div className="pt-3 border-t border-gray-200">
-            <div className="bg-yellow-400 text-black text-center py-2 rounded font-medium text-sm group-hover:bg-yellow-500 transition-colors">
+            <div className="bg-yellow-400 text-white text-center py-2 rounded font-medium text-sm group-hover:bg-yellow-500 transition-colors">
               Clique para ver detalhes
             </div>
           </div>

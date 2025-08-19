@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
+        border: "hsl(var(--border))",     
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
@@ -41,6 +41,36 @@ const config: Config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        // Cor personalizada para substituir yellow
+        custom: {
+          DEFAULT: "#877a4e",
+          50: "#fefdf9",
+          100: "#fdfbf2",
+          200: "#f9f4e0",
+          300: "#f2e9c5",
+          400: "#e8d9a3",
+          500: "#d9c77d",
+          600: "#c7b25f",
+          700: "#877a4e",
+          800: "#6b6140",
+          900: "#5a5035",
+          950: "#3a3221",
+        },
+        // Sobrescrevendo as cores yellow padrão
+        yellow: {
+          50: "#fefdf9",
+          100: "#fdfbf2",
+          200: "#f9f4e0",
+          300: "#f2e9c5",
+          400: "#e8d9a3",
+          500: "#d9c77d",
+          600: "#c7b25f",
+          700: "#877a4e",
+          800: "#6b6140",
+          900: "#5a5035",
+          950: "#3a3221",
+          DEFAULT: "#877a4e",
         },
       },
       borderRadius: {

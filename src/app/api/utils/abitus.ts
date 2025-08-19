@@ -67,8 +67,8 @@ export function mapAbitusPersonToPerson(abitusPerson: AbitusPerson): Person {
     ultimaOcorrencia: abitusPerson.ultimaOcorrencia?.ocorrenciaEntrevDesapDTO?.informacao || '',
     foto: abitusPerson.urlFoto || '',
     sexo: abitusPerson.sexo === 'MASCULINO' ? 'masculino' : 'feminino',
-    // Considera localizado quando encontradoVivo é true
-    localizado: Boolean(abitusPerson.ultimaOcorrencia?.encontradoVivo)
+    // Considera localizado quando há data de localização ou quando encontradoVivo é true
+    localizado: Boolean(abitusPerson.ultimaOcorrencia?.dataLocalizacao || abitusPerson.ultimaOcorrencia?.encontradoVivo)
   };
 }
 

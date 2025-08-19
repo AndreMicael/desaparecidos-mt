@@ -84,27 +84,67 @@ body {
 
 /* Cores específicas do sistema */
 .text-yellow-400 {
-  color: #fbbf24;
+  color: #877a4e;
 }
 
 .bg-yellow-400 {
-  background-color: #fbbf24;
+  background-color: #877a4e;
 }
 
 .border-yellow-400 {
-  border-color: #fbbf24;
+  border-color: #877a4e;
 }
 
 .hover\:bg-yellow-500:hover {
-  background-color: #f59e0b;
+  background-color: #6b6140;
 }
 
 .hover\:text-yellow-400:hover {
-  color: #fbbf24;
+  color: #877a4e;
 }
 
 .hover\:border-yellow-400:hover {
-  border-color: #fbbf24;
+  border-color: #877a4e;
+}
+
+/* Variações adicionais de yellow */
+.text-yellow-500 {
+  color: #6b6140;
+}
+
+.text-yellow-600 {
+  color: #5a5035;
+}
+
+.bg-yellow-50 {
+  background-color: #fefdf9;
+}
+
+.bg-yellow-100 {
+  background-color: #fdfbf2;
+}
+
+.bg-yellow-300 {
+  background-color: #f2e9c5;
+}
+
+.bg-yellow-500 {
+  background-color: #6b6140;
+}
+
+.hover\:bg-yellow-300:hover {
+  background-color: #f2e9c5;
+}
+
+/* Gradientes customizados */
+.from-yellow-400 {
+  --tw-gradient-from: #877a4e;
+  --tw-gradient-to: rgb(135 122 78 / 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.to-yellow-500 {
+  --tw-gradient-to: #6b6140;
 }
 
 /* Background espelhado para o hero */

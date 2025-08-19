@@ -62,8 +62,8 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
              <div className="bg-black/30 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl w-full max-w-sm font-encode-sans border border-white/20">
          {/* Header */}
          <div className="bg-yellow-400 px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2">
-          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
-          <h3 className="text-black font-bold text-xs sm:text-sm">BUSCAR PESSOA DESAPARECIDA</h3>
+          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+          <h3 className="text-white font-bold text-xs sm:text-sm">BUSCAR PESSOA DESAPARECIDA</h3>
         </div>
 
         {/* Form */}
@@ -115,7 +115,7 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
                       id="masculino-compact"
                       checked={filters.sexos.includes('masculino')}
                       onCheckedChange={() => toggleSexo('masculino')}
-                      className="border-white/40 data-[state=checked]:text-black data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
+                      className="border-white/40 data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
                     />
                     <label htmlFor="masculino-compact" className="text-white cursor-pointer text-xs">
                       Masculino
@@ -126,7 +126,7 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
                       id="feminino-compact"
                       checked={filters.sexos.includes('feminino')}
                       onCheckedChange={() => toggleSexo('feminino')}
-                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
+                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
                     />
                     <label htmlFor="feminino-compact" className="text-white cursor-pointer text-xs">
                       Feminino
@@ -144,7 +144,7 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
                       id="desaparecido-compact"
                       checked={filters.status.includes('desaparecido')}
                       onCheckedChange={() => toggleStatus('desaparecido')}
-                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
+                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
                     />
                     <label htmlFor="desaparecido-compact" className="text-white cursor-pointer text-xs">
                       Desaparecido
@@ -155,7 +155,7 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
                       id="localizado-compact"
                       checked={filters.status.includes('localizado')}
                       onCheckedChange={() => toggleStatus('localizado')}
-                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
+                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
                     />
                     <label htmlFor="localizado-compact" className="text-white cursor-pointer text-xs">
                       Localizado
@@ -169,7 +169,7 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
             <div className="flex flex-col gap-2 pt-2">
               <Button
                 type="submit"
-                className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold text-xs sm:text-sm h-8 sm:h-9 w-full"
+                className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold text-xs sm:text-sm h-8 sm:h-9 w-full"
               >
                 <Search className="w-3 h-3 mr-2" />
                 BUSCAR
@@ -194,8 +194,8 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
     <div className="bg-black/80 backdrop-blur-sm rounded-lg overflow-hidden shadow-2xl font-encode-sans">
       {/* Header */}
       <div className="bg-yellow-400 p-4 flex items-center gap-3">
-        <Search className="w-6 h-6 text-black" />
-        <h2 className="text-black font-bold text-lg">BUSCAR PESSOA DESAPARECIDA</h2>
+        <Search className="w-6 h-6 text-white" />
+        <h2 className="text-white font-bold text-lg">BUSCAR PESSOA DESAPARECIDA</h2>
       </div>
 
       {/* Form */}
@@ -310,7 +310,7 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
             
             <Button
               type="submit"
-              className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold px-8 py-2"
+              className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-8 py-2"
             >
               <Search className="w-4 h-4 mr-2" />
               BUSCAR

@@ -150,7 +150,7 @@ export default function LocalizadosPage() {
                     onClick={() => navigateToPage(currentPage - 1)}
                     disabled={currentPage === 1}
                     variant="outline"
-                    className="flex items-center gap-2 bg-white border-2 border-black text-black hover:bg-black hover:text-white"
+                    className="flex items-center gap-2 bg-transparent border-2 border-yellow-400 text-gray-700 hover:bg-[#877a4e] hover:text-white disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Anterior
@@ -164,7 +164,7 @@ export default function LocalizadosPage() {
                     onClick={() => navigateToPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
                     variant="outline"
-                    className="flex items-center gap-2 bg-white border-2 border-black text-black hover:bg-black hover:text-white"
+                    className="flex items-center gap-2 bg-transparent border-2 border-yellow-400 text-gray-700 hover:bg-[#877a4e] hover:text-white disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400"
                   >
                     Próxima
                     <ChevronRight className="w-4 h-4" />

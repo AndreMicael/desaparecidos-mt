@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Phone, Mail, Instagram, Facebook } from 'lucide-react';
+import { XLogo } from '@phosphor-icons/react';
 
 export function Header() {
   const pathname = usePathname();
@@ -42,7 +43,7 @@ export function Header() {
                   rel="noopener noreferrer"
                   className="w-6 h-6 bg-yellow-400 border border-black rounded flex items-center justify-center hover:bg-yellow-300 transition-colors"
                 >
-                  <Instagram className="w-3 h-3 text-black" />
+                  <Instagram className="w-4 h-4 text-white" />
                 </a>
                 <a 
                   href="https://facebook.com/policiacivilmt" 
@@ -50,15 +51,15 @@ export function Header() {
                   rel="noopener noreferrer"
                   className="w-6 h-6 bg-yellow-400 border border-black rounded flex items-center justify-center hover:bg-yellow-300 transition-colors"
                 >
-                  <Facebook className="w-3 h-3 text-black" />
+                  <Facebook className="  w-4 h-4 text-white" />
                 </a>
                 <a 
                   href="https://x.com/policiacivilmt" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="w-6 h-6 bg-yellow-400 border border-black rounded flex items-center justify-center text-black text-xs font-bold hover:bg-yellow-300 transition-colors"
+                  className="w-6 h-6 bg-yellow-400 border border-black rounded flex items-center justify-center text-white text-xs font-normal hover:bg-yellow-300 transition-colors"
                 >
-                  X
+                  <XLogo size={16} />
                 </a>
               </div>
             </div>

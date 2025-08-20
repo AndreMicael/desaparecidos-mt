@@ -83,7 +83,7 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
             <Badge 
               variant={person.localizado ? "default" : "destructive"}
               className={person.localizado 
-                ? "bg-green-500 text-black hover:bg-green-500 border-none font-medium" 
+                ? "bg-green-500 text-white hover:bg-green-500 border-none font-medium" 
                 : "bg-red-600 text-white hover:bg-red-700 border-none font-medium"
               }
             >

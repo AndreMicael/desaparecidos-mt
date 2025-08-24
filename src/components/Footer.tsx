@@ -7,11 +7,13 @@ export function Footer() {
       <div className="bg-gray-900 py-6 border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center space-x-4">
-            <div className="w-12 h-12 bg-yellow-400 rounded-lg flex items-center justify-center">
-              <span className="text-2xl font-bold text-black">!</span>
+            <div className="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-yellow-400">VOCÊ SABIA?</h3>
+              <h3 className="text-base font-semibold text-yellow-400">VOCÊ SABIA?</h3>
               <p className="text-sm text-gray-300">
                 QUE É NECESSÁRIO AGUARDAR 24 HORAS PARA REGISTRAR O DESAPARECIMENTO DE UMA PESSOA ADULTA?
               </p>
@@ -97,8 +99,8 @@ export function Footer() {
                   <p className="text-xs text-gray-200">Bombeiros</p>
                 </div>
                 <div className="p-3 bg-yellow-400 rounded-lg text-center">
-                  <p className="font-bold text-lg text-black">181</p>
-                  <p className="text-xs text-black">Disque Denúncia</p>
+                  <p className="font-bold text-lg text-black">197</p>
+                  <p className="text-xs text-black">Polícia Civil</p>
                 </div>
               </div>
             </div>

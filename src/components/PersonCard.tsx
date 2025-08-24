@@ -1,12 +1,11 @@
 "use client";
 
-import { Calendar, MapPin, User, Clock, UserCheck, UserX } from 'lucide-react';
+import { User } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './ui/image-with-fallback';
 import { Person } from '@/types/person';
 import { useRouter } from 'next/navigation';
-import { GenderMale, GenderFemale } from '@phosphor-icons/react';
 
 interface PersonCardProps {
   person: Person;
@@ -65,7 +64,7 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
 
   return (
     <Card 
-      className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-2 border-gray-200 hover:border-yellow-400 bg-white text-black overflow-hidden font-encode-sans"
+      className="group cursor-pointer hover:shadow-sm transition-all duration-200 border border-gray-200 hover:border-gray-400 bg-white text-black overflow-hidden font-encode-sans"
       onClick={handleCardClick}
     >
       <CardContent className="p-0">
@@ -74,17 +73,23 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
           <ImageWithFallback
             src={person.foto}
             alt={`Foto de ${person.nome}`}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover transition-transform duration-200"
             containerClassName="w-full h-full"
-            placeholder={<User className="w-16 h-16 text-gray-400" />}
+            placeholder={
+              <div className="w-full h-full flex items-center justify-center">
+                <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+            }
           />
           {/* Status badge overlay */}
-          <div className="absolute top-3 right-3 z-10">
+          <div className="absolute top-2 right-2 z-10">
             <Badge 
               variant={person.localizado ? "default" : "destructive"}
               className={person.localizado 
-                ? "bg-green-500 text-white hover:bg-green-500 border-none font-medium" 
-                : "bg-red-600 text-white hover:bg-red-700 border-none font-medium"
+                ? "bg-emerald-700 text-white hover:bg-gray-800 border-none font-medium text-xs rounded-sm" 
+                : "bg-red-800 text-white hover:bg-gray-800 border-none font-medium text-xs rounded-sm"
               }
             >
               {person.localizado ? 'Localizado' : 'Desaparecido'}
@@ -96,17 +101,17 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
         <div className="p-4 space-y-3 bg-white">
           {/* Header */}
           <div className="space-y-2">
-            <h3 className="font-bold text-gray-700 line-clamp-1 text-lg">
+            <h3 className="font-semibold text-gray-900 line-clamp-1 text-base">
               {person.nome}
             </h3>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between text-sm">
               {age && (
-                <span className="text-sm text-white font-medium bg-gray-500 bg-opacity-20 px-2 py-1 rounded">
+                <span className="text-gray-600 font-medium">
                   {age} anos
                 </span>
               )}
-              <span className="text-xs text-gray-600 uppercase tracking-wide font-medium">
-                {person.sexo === 'masculino' ? <p className='flex gap-2'><GenderMale  className="w-4 h-4" /> Masculino</p>: <p className='flex gap-2'><GenderFemale  className="w-4 h-4" /> Feminino</p>}
+              <span className="text-gray-600 capitalize">
+                {person.sexo}
               </span>
             </div>
           </div>
@@ -114,31 +119,29 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
           {/* Details */}
           <div className="space-y-2 text-sm">
             {person.dtDesaparecimento && (
-              <div className="flex items-center gap-2 text-gray-700">
-                <Calendar className="w-4 h-4 text-yellow-500" />
-                <span>Desapareceu em {formatDate(person.dtDesaparecimento)}</span>
+              <div className="flex items-center gap-2 text-gray-600">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Desde {formatDate(person.dtDesaparecimento)}</span>
               </div>
             )}
             
             {person.localDesaparecimentoConcat && (
-              <div className="flex items-start gap-2 text-gray-700">
-                <MapPin className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-2 text-gray-600">
+                <svg className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
                 <span className="line-clamp-2">{person.localDesaparecimentoConcat}</span>
-              </div>
-            )}
-            
-            {person.ultimaOcorrencia && (
-              <div className="flex items-start gap-2 text-gray-700">
-                <Clock className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
-                <span className="line-clamp-2">{person.ultimaOcorrencia}</span>
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div className="pt-3 border-t border-gray-200">
-            <div className="bg-yellow-400 text-white text-center py-2 rounded font-medium text-sm group-hover:bg-yellow-500 transition-colors">
-              Clique para ver detalhes
+          <div className="pt-3 border-t border-gray-100">
+            <div className="bg-gray-900 hover:bg-gray-50 hover:text-black hover:outline-2 hover:outline-black text-white text-center py-2 rounded-sm font-medium text-sm group-hover:bg-gray-800 transition-colors">
+              Ver detalhes
             </div>
           </div>
         </div>

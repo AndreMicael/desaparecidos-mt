@@ -7,6 +7,7 @@ import { Loader2, ArrowLeft, Phone, Mail, MapPin, Calendar } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { InstagramLogoIcon, WhatsappLogo } from '@phosphor-icons/react';
 
 // Lazy loading dos componentes
 const Button = dynamic(() => import('@/components/ui/button').then(mod => ({ default: mod.Button })), {
@@ -66,7 +67,7 @@ export default function DesaparecidoPage() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-yellow-500 mx-auto mb-4" />
-          <p className="text-gray-600">Carregando dados da pessoa...</p>
+          
         </div>
       </div>
     );
@@ -88,196 +89,228 @@ export default function DesaparecidoPage() {
     );
   }
 
+  const handleShare = (platform: 'whatsapp' | 'instagram') => {
+    const text = `🔍 PESSOA DESAPARECIDA: ${person.nome}\n📅 Desde: ${person.dtDesaparecimento ? new Date(person.dtDesaparecimento).toLocaleDateString('pt-BR') : 'Data não informada'}\n📍 Local: ${person.localDesaparecimentoConcat || 'Não informado'}\n\nSe você tem informações, entre em contato: 197`;
+    
+    if (platform === 'whatsapp') {
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      window.open(whatsappUrl, '_blank');
+    } else if (platform === 'instagram') {
+      // Para Instagram, copiamos o texto para a área de transferência
+      navigator.clipboard.writeText(text).then(() => {
+        toast.success('Texto copiado! Cole no Instagram para compartilhar.');
+      });
+    }
+  };
+
+  const daysSinceDisappearance = person.dtDesaparecimento 
+    ? Math.floor((new Date().getTime() - new Date(person.dtDesaparecimento).getTime()) / (1000 * 3600 * 24))
+    : null;
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 py-8">
-        <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header com botão voltar */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 py-3">
           <Button
             onClick={handleBack}
             variant="ghost"
-            className="text-black hover:bg-black/10 mb-4"
+            className="text-gray-700 hover:bg-gray-50 border border-gray-300 hover:border-gray-400"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
-          
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">
-              DETALHES DA PESSOA DESAPARECIDA
-            </h1>
-            <p className="text-black/80">
-              Informações detalhadas para ajudar na localização
-            </p>
-          </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="py-12 font-encode-sans">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            {/* Person Header */}
-            <div className="bg-gray-50 p-6 border-b">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                                 {/* Photo */}
-                 <div className="w-32 h-32 bg-gray-200 rounded-lg overflow-hidden">
-                   <ImageWithFallback
-                     src={person.foto}
-                     alt={person.nome}
-                     className="w-full h-full object-cover"
-                     containerClassName="w-full h-full"
-                     placeholder={<div className="text-gray-400 text-4xl">👤</div>}
-                   />
-                 </div>
-
-                {/* Basic Info */}
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    {person.nome}
-                  </h2>
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                    {person.idade && (
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {person.idade} anos
-                      </div>
-                    )}
-                    {person.sexo && (
-                      <div className="flex items-center gap-1">
-                        <span className="capitalize">{person.sexo}</span>
-                      </div>
-                    )}
-                    {person.cidade && (
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {person.cidade}
-                      </div>
-                    )}
+      {/* Main Content */}
+      <div className="py-4 md:py-8">
+        <div className="max-w-4xl mx-auto px-3 md:px-4">
+          {/* Card Principal */}
+          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+            <div className="p-4 md:p-6">
+              <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
+                {/* Foto */}
+                <div className="flex-shrink-0 mx-auto lg:mx-0">
+                  <div className="w-48 h-64 sm:w-56 sm:h-72 lg:w-64 lg:h-80 bg-gray-100 rounded-lg overflow-hidden border border-gray-300">
+                    <ImageWithFallback
+                      src={person.foto}
+                      alt={person.nome}
+                      className="w-full h-full object-cover"
+                      containerClassName="w-full h-full"
+                      placeholder={
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                          <svg className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                          </svg>
+                        </div>
+                      }
+                    />
                   </div>
                 </div>
 
-                {/* Status Badge */}
-                <div className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                  person.localizado 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {person.localizado ? 'LOCALIZADO' : 'DESAPARECIDO'}
+                {/* Informações */}
+                <div className="flex-1 space-y-3 md:space-y-4">
+                  {/* Badge de Status */}
+                  <div className="flex justify-center lg:justify-start">
+                    <span className="bg-gray-800 text-white px-3 py-1 text-xs sm:text-sm font-medium rounded-sm uppercase tracking-wide">
+                      Desaparecido
+                    </span>
+                  </div>
+
+                  {/* Nome */}
+                  <div className="text-center lg:text-left">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900 mb-1">
+                      {person.nome}
+                    </h1>
+                    <p className="text-gray-600 text-base sm:text-lg font-light">
+                      {person.idade && `${person.idade} anos`} {person.idade && person.sexo && ' • '} 
+                      {person.sexo && <span className="capitalize">{person.sexo}</span>}
+                    </p>
+                  </div>
+
+                  {/* Dados sobre o Desaparecimento */}
+                  <div className="space-y-4 border-t border-gray-100 pt-4">
+                    <h3 className="text-base sm:text-lg font-medium text-gray-900 text-center lg:text-left">
+                      Informações do Desaparecimento
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 gap-3 text-sm">
+                      {person.dtDesaparecimento && (
+                        <div className="flex items-start gap-3 text-center lg:text-left">
+                          <svg className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <div>
+                            <span className="font-medium text-gray-700">Data:</span>
+                            <span className="ml-2 text-gray-600">{new Date(person.dtDesaparecimento).toLocaleDateString('pt-BR')}</span>
+                          </div>
+                        </div>
+                      )}
+                      {person.localDesaparecimentoConcat && (
+                        <div className="flex items-start gap-3 text-center lg:text-left">
+                          <svg className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <div>
+                            <span className="font-medium text-gray-700">Local:</span>
+                            <span className="ml-2 text-gray-600">{person.localDesaparecimentoConcat.charAt(0).toUpperCase() + person.localDesaparecimentoConcat.slice(1)}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {person.ultimaOcorrencia && (
+                      <div className="text-center lg:text-left">
+                        <div className="flex items-start gap-3">
+                          <svg className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <div>
+                            <span className="font-medium text-gray-700">Informações adicionais:</span>
+                            <p className="mt-1 text-gray-600 leading-relaxed text-sm">
+                              {person.ultimaOcorrencia}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Badge de dias desaparecido */}
+                  {daysSinceDisappearance && (
+                    <div className="bg-gray-100 border border-gray-300 rounded-sm p-3">
+                      <div className="flex items-center gap-2 justify-center lg:justify-start">
+                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="text-gray-700 font-medium text-sm sm:text-base text-center lg:text-left">
+                          Desaparecido há {daysSinceDisappearance} dias
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Botão de Ação Principal */}
+                  <div className="pt-4 border-t border-gray-100">
+                    <Button 
+                      className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-sm text-sm sm:text-base transition-colors duration-200"
+                      onClick={() => {
+                        const phoneNumber = '197';
+                        const message = `Tenho informações sobre ${person.nome}, pessoa desaparecida desde ${person.dtDesaparecimento ? new Date(person.dtDesaparecimento).toLocaleDateString('pt-BR') : 'data não informada'}.`;
+                        window.open(`tel:${phoneNumber}`, '_self');
+                      }}
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        TEM INFORMAÇÕES? LIGUE 197
+                      </div>
+                    </Button>
+                  </div>
+
+                  {/* Ajude compartilhando */}
+                  <div className="pt-4 border-t border-gray-100">
+                    <h4 className="text-base font-medium text-gray-900 mb-3 text-center lg:text-left">
+                      Compartilhar informações
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <Button
+                        onClick={() => handleShare('whatsapp')}
+                        variant="outline"
+                        className="w-full cursor-pointer border-gray-300 text-white hover:outline-2 hover:outline-black hover:text-black hover:bg-gray-50 hover:border-gray-400 font-normal py-2.5 px-4 rounded-sm text-sm transition-colors duration-200"
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                        <WhatsappLogo size={22} />
+                          WhatsApp
+                        </div>
+                      </Button>
+                      
+                      <Button
+                        onClick={() => handleShare('instagram')}
+                        variant="outline"
+                        className="w-full cursor-pointer border-gray-300 text-white hover:text-black hover:bg-gray-50 hover:outline-2 hover:outline-black font-normal py-2.5 px-4 rounded-sm text-sm transition-colors duration-200"
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                        <InstagramLogoIcon size={22} weight="bold" />
+                          Instagram
+                        </div>
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Detailed Information */}
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Left Column */}
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      Informações Pessoais
-                    </h3>
-                    <div className="space-y-3">
-                      {person.nome && (
-                        <div>
-                          <span className="font-medium text-gray-700">Nome:</span>
-                          <span className="ml-2 text-gray-900">{person.nome}</span>
-                        </div>
-                      )}
-                      {person.idade && (
-                        <div>
-                          <span className="font-medium text-gray-700">Idade:</span>
-                          <span className="ml-2 text-gray-900">{person.idade} anos</span>
-                        </div>
-                      )}
-                      {person.sexo && (
-                        <div>
-                          <span className="font-medium text-gray-700">Sexo:</span>
-                          <span className="ml-2 text-gray-900 capitalize">{person.sexo}</span>
-                        </div>
-                      )}
-                      {person.cidade && (
-                        <div>
-                          <span className="font-medium text-gray-700">Cidade:</span>
-                          <span className="ml-2 text-gray-900">{person.cidade}</span>
-                        </div>
-                      )}
-                      {person.estado && (
-                        <div>
-                          <span className="font-medium text-gray-700">Estado:</span>
-                          <span className="ml-2 text-gray-900">{person.estado}</span>
-                        </div>
-                      )}
-                    </div>
+          {/* Seção de Contato */}
+          <div className="mt-6 sm:mt-8 bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4 text-center sm:text-left">
+              Informações de Contato
+            </h3>
+            <div className="bg-gray-50 border border-gray-200 rounded-sm p-4">
+              <p className="text-gray-700 mb-4 text-sm sm:text-base text-center sm:text-left">
+                Se você tem informações sobre esta pessoa, entre em contato:
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-center gap-3 text-gray-700 justify-center sm:justify-start">
+                  <svg className="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <div className="text-center sm:text-left">
+                    <p className="font-medium text-sm sm:text-base text-gray-900">197 - Polícia Civil</p>
+                    <p className="text-xs sm:text-sm text-gray-600">Disque Denúncia</p>
                   </div>
-
-                  {person.descricao && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                        Descrição
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {person.descricao}
-                      </p>
-                    </div>
-                  )}
                 </div>
-
-                {/* Right Column */}
-                <div className="space-y-6">
-                  {person.dataDesaparecimento && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                        Data do Desaparecimento
-                      </h3>
-                      <p className="text-gray-700">
-                        {new Date(person.dataDesaparecimento).toLocaleDateString('pt-BR')}
-                      </p>
-                    </div>
-                  )}
-
-                  {person.localDesaparecimento && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                        Local do Desaparecimento
-                      </h3>
-                      <p className="text-gray-700">
-                        {person.localDesaparecimento}
-                      </p>
-                    </div>
-                  )}
-
-                  {person.informacoesAdicionais && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                        Informações Adicionais
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {person.informacoesAdicionais}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Contact Information */}
-              <div className="mt-8 pt-6 border-t">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Como Ajudar
-                </h3>
-                <div className="bg-yellow-50 p-4 rounded-lg">
-                  <p className="text-gray-700 mb-3">
-                    Se você tem informações sobre esta pessoa, entre em contato conosco:
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <Phone className="w-4 h-4" />
-                      <span>197 - Polícia Civil</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <Mail className="w-4 h-4" />
-                      <span>desaparecidos@policiacivil.mt.gov.br</span>
-                    </div>
+                <div className="flex items-center gap-3 text-gray-700 justify-center sm:justify-start">
+                  <svg className="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <div className="text-center sm:text-left">
+                    <p className="font-medium text-xs sm:text-sm text-gray-900 break-all">desaparecidos@policiacivil.mt.gov.br</p>
+                    <p className="text-xs sm:text-sm text-gray-600">E-mail oficial</p>
                   </div>
                 </div>
               </div>

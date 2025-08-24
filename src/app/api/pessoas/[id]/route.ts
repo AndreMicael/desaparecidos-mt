@@ -3,10 +3,10 @@ import { AbitusResponse, mapAbitusPersonToPerson } from '../../utils/abitus';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
     console.log('Buscando pessoa com ID:', id);
 
     if (!id) {
@@ -85,9 +85,10 @@ export async function GET(
   } catch (error) {
     console.error('Erro ao buscar pessoa:', error);
     // Em caso de erro, retornar dados mockados como fallback
+    const { id: errorId } = await params;
     const mockPerson = {
-      id: parseInt(params.id || '1'),
-      nome: `Pessoa ${params.id || '1'}`,
+      id: parseInt(errorId || '1'),
+      nome: `Pessoa ${errorId || '1'}`,
       idade: 25,
       sexo: 'masculino' as const,
       localizado: false,

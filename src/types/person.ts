@@ -9,6 +9,14 @@ export interface Person {
   foto?: string;
   sexo: 'masculino' | 'feminino';
   localizado: boolean;
+  // Propriedades adicionais usadas nas páginas de detalhes
+  cidade?: string;
+  estado?: string;
+  descricao?: string;
+  dataDesaparecimento?: string;
+  localDesaparecimento?: string;
+  informacoesAdicionais?: string;
+  dataLocalizacao?: string;
 }
 
 export interface SearchFilters {

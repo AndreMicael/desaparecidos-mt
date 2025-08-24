@@ -142,7 +142,15 @@ export default function LocalizadoPage() {
                      alt={person.nome}
                      className="w-full h-full object-cover"
                      containerClassName="w-full h-full"
-                     placeholder={<div className="text-gray-400 text-4xl">👤</div>}
+                     placeholder={
+                       <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                         <img 
+                           src="/placeholder-modern-neutral.svg" 
+                           alt="Sem foto disponível"
+                           className="w-full h-full object-cover"
+                         />
+                       </div>
+                     }
                    />
                  </div>
 

@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Person } from '@/types/person';
 import { toast } from 'sonner';
-import { Loader2, ArrowLeft, Phone, Mail, MapPin, Calendar } from 'lucide-react';
+import { Loader2, ArrowLeft, Phone, Mail, MapPin, Calendar, FileImage } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { InstagramLogoIcon, WhatsappLogo } from '@phosphor-icons/react';
+import { PosterGenerator } from '@/components/PosterGenerator';
 
 // Lazy loading dos componentes
 const Button = dynamic(() => import('@/components/ui/button').then(mod => ({ default: mod.Button })), {
@@ -24,6 +25,7 @@ export default function DesaparecidoPage() {
   const [person, setPerson] = useState<Person | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPosterGenerator, setShowPosterGenerator] = useState(false);
 
   const personId = params.id as string;
 
@@ -140,9 +142,11 @@ export default function DesaparecidoPage() {
                       containerClassName="w-full h-full"
                       placeholder={
                         <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                          <svg className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                          </svg>
+                          <img 
+                            src="/placeholder-modern-neutral.svg" 
+                            alt="Sem foto disponível"
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                       }
                     />
@@ -251,19 +255,19 @@ export default function DesaparecidoPage() {
                     </Button>
                   </div>
 
-                  {/* Ajude compartilhando */}
+                                    {/* Ajude compartilhando */}
                   <div className="pt-4 border-t border-gray-100">
                     <h4 className="text-base font-medium text-gray-900 mb-3 text-center lg:text-left">
                       Compartilhar informações
                     </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                       <Button
                         onClick={() => handleShare('whatsapp')}
                         variant="outline"
                         className="w-full cursor-pointer border-gray-300 text-white hover:outline-2 hover:outline-black hover:text-black hover:bg-gray-50 hover:border-gray-400 font-normal py-2.5 px-4 rounded-sm text-sm transition-colors duration-200"
                       >
                         <div className="flex items-center justify-center gap-2">
-                        <WhatsappLogo size={22} />
+                         <WhatsappLogo size={22} />
                           WhatsApp
                         </div>
                       </Button>
@@ -271,14 +275,28 @@ export default function DesaparecidoPage() {
                       <Button
                         onClick={() => handleShare('instagram')}
                         variant="outline"
-                        className="w-full cursor-pointer border-gray-300 text-white hover:text-black hover:bg-gray-50 hover:outline-2 hover:outline-black font-normal py-2.5 px-4 rounded-sm text-sm transition-colors duration-200"
+                        className="w-full cursor-pointer border-gray-300 text-white
+                         hover:text-black hover:bg-gray-50 hover:outline-2 hover:outline-black font-normal py-2.5 px-4 rounded-sm text-sm transition-colors duration-200"
                       >
                         <div className="flex items-center justify-center gap-2">
-                        <InstagramLogoIcon size={22} weight="bold" />
+                         <InstagramLogoIcon size={22} weight="bold" />
                           Instagram
                         </div>
                       </Button>
                     </div>
+                    
+                    {/* Botão de Cartaz - só aparece se tiver foto */}
+                    {person.foto && (
+                      <Button
+                        onClick={() => setShowPosterGenerator(true)}
+                        className="w-full bg-black text-white  cursor-pointer hover:text-black hover:bg-gray-50 hover:outline-2 hover:outline-black 00"
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <FileImage className="w-4 h-4" />
+                          Gerar Cartaz para Impressão
+                        </div>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -319,6 +337,15 @@ export default function DesaparecidoPage() {
         </div>
       </div>
       <Toaster position="top-right" />
+      
+      {/* Gerador de Cartaz */}
+      {person && (
+        <PosterGenerator
+          person={person}
+          isOpen={showPosterGenerator}
+          onClose={() => setShowPosterGenerator(false)}
+        />
+      )}
     </div>
   );
 }

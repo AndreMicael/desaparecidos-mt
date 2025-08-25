@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Person } from '@/types/person';
-import { X, Download, Eye } from 'lucide-react';
+import { X, Download, Eye, Phone } from 'lucide-react';
+import domtoimage from 'dom-to-image';
 import html2canvas from 'html2canvas';
 import QRCode from 'qrcode';
 import { WhatsappLogoIcon } from '@phosphor-icons/react';
@@ -19,9 +20,14 @@ export function PosterGenerator({ person, isOpen, onClose }: PosterGeneratorProp
   const posterRef = useRef<HTMLDivElement>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (isOpen && person.id) {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient && isOpen && person.id) {
       const currentUrl = `${window.location.origin}/desaparecidos/pessoa/${person.id}`;
       QRCode.toDataURL(currentUrl, {
         width: 120,
@@ -32,29 +38,62 @@ export function PosterGenerator({ person, isOpen, onClose }: PosterGeneratorProp
         }
       }).then(setQrCodeUrl);
     }
-  }, [isOpen, person.id]);
+  }, [isClient, isOpen, person.id]);
 
   const downloadPoster = async () => {
     if (!posterRef.current) return;
     
     setIsGenerating(true);
     try {
-      const canvas = await html2canvas(posterRef.current, {
-        scale: 2,
-        backgroundColor: '#1f2937',
-        useCORS: true,
-        allowTaint: true,
-        logging: false,
-        width: 960,
-        height: 800
-      });
+      console.log('Iniciando geração do poster...');
+      
+      // Aguarda um pouco para garantir que o DOM está pronto
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // Aguarda um pouco mais para garantir que as imagens carregaram
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      let dataUrl: string;
+      
+      try {
+        // Tenta primeiro com dom-to-image
+        console.log('Tentando com dom-to-image...');
+        dataUrl = await domtoimage.toPng(posterRef.current, {
+          quality: 1.0,
+          bgcolor: '#1f2937',
+          width: 960,
+          height: 800,
+          cacheBust: true
+        });
+        console.log('dom-to-image funcionou!');
+      } catch (domError) {
+        console.log('dom-to-image falhou, tentando html2canvas...');
+        // Se falhar, tenta com html2canvas
+        const canvas = await html2canvas(posterRef.current, {
+          scale: 2,
+          backgroundColor: '#1f2937',
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
+          width: 960,
+          height: 800
+        });
+        dataUrl = canvas.toDataURL();
+        console.log('html2canvas funcionou!');
+      }
+      
+      console.log('Poster gerado com sucesso');
       
       const link = document.createElement('a');
       link.download = `cartaz-${person.nome.replace(/\s+/g, '-').toLowerCase()}.png`;
-      link.href = canvas.toDataURL();
+      link.href = dataUrl;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      
     } catch (error) {
       console.error('Erro ao gerar cartaz:', error);
+      alert('Erro ao gerar o cartaz. Tente novamente.');
     } finally {
       setIsGenerating(false);
     }
@@ -98,111 +137,154 @@ export function PosterGenerator({ person, isOpen, onClose }: PosterGeneratorProp
 
         {/* Poster Content */}
         <div className="p-6 flex justify-center">
-          <div
-            ref={posterRef}
-            className="w-[1000px] h-[800px] relative overflow-hidden"
-            style={{ backgroundColor: '#1f2937', fontFamily: 'Ubuntu, sans-serif' }}
-          >
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="text-white text-[180px] font-bold transform rotate-90 absolute -left-16 top-1/2 -translate-y-1/2">
-                DESAPARECIDO(A)
-              </div>
-              <div className="text-white text-[180px] font-bold transform -rotate-90 absolute -right-16 top-1/2 -translate-y-1/2">
-                DESAPARECIDO(A)
-              </div>
-            </div>
+                     <div
+             ref={posterRef}
+             style={{ 
+               width: '1000px', 
+               height: '800px', 
+               position: 'relative', 
+               overflow: 'hidden',
+               backgroundColor: '#1f2937', 
+               fontFamily: 'Inter, sans-serif' 
+             }}
+           >
+          
 
-            {/* Header */}
-            <div className="relative z-10 p-4">
-              <div className="flex items-center gap-4 mb-3">
-                {/* Logo Polícia Civil */}
-                <div className="w-16 h-16 rounded-full flex items-center justify-center">
-                 <Image src={LogoPJC} alt="Logo Polícia Civil" className="w-full h-full object-contain" />
-                </div>
-                <div className="flex-1">
-                  <h1 className="text-white text-2xl font-bold">DESAPARECIDO(A)</h1>
-                </div>
-                <div className=" text-white px-3 py-2 justify-end text-right rounded-md font-bold text-sm">
-                  DESDE<br />
-                  {person.dtDesaparecimento ? formatDate(person.dtDesaparecimento) : 'DATA NÃO INFORMADA'}
-                </div>
+                         {/* Header */}
+             <div style={{ position: 'relative', zIndex: 10, padding: '16px' }}>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '12px' }}>
+                                 {/* Logo Polícia Civil */}
+                 <div style={{ width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Image 
+                    src={LogoPJC} 
+                    alt="Logo Polícia Civil" 
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'contain',
+                      minWidth: '64px',
+                      minHeight: '64px',
+                      maxWidth: '64px',
+                      maxHeight: '64px'
+                    }} 
+                  />
+                 </div>
+                 <div style={{ flex: 1 }}>
+                   <h1 style={{ color: '#ffffff', fontSize: '24px', fontWeight: 'bold' }}>DESAPARECIDO(A)</h1>
+                 </div>
+                                 <div style={{ color: '#ffffff', padding: '8px 12px', textAlign: 'right', borderRadius: '6px', fontWeight: 'bold', fontSize: '14px' }}>
+                   DESDE<br />
+                   {person.dtDesaparecimento ? formatDate(person.dtDesaparecimento) : 'DATA NÃO INFORMADA'}
+                 </div>
               </div>
 
-              {/* Main Content */}
-              <div className="bg-white rounded-lg p-4 mb-3">
+                             {/* Main Content */}
+               <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', padding: '16px', marginBottom: '12px' }}>
                                  {/* Layout em Grid 2x2 para aproveitar espaço quadrado */}
-                 <div className="grid grid-cols-2 gap-6 h-[500px]">
+                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', height: '500px' }}>
                   {/* Coluna Esquerda - Foto e Nome */}
-                  <div className="flex flex-col items-center">
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     {/* Foto com proporção 3x4 (retrato) */}
-                    <div className="w-3/4 aspect-[3/4] border-2 overflow-hidden mb-3" style={{ backgroundColor: '#e5e7eb', borderColor: '#d1d5db' }}>
+                    <div style={{ width: '75%', aspectRatio: '3/4', border: '2px solid #d1d5db', overflow: 'hidden', marginBottom: '12px', backgroundColor: '#e5e7eb' }}>
                      {person.foto ? (
-                       <img
-                         src={person.foto}
-                         alt={person.nome}
-                         className="w-full h-full object-cover"
-                         crossOrigin="anonymous"
+                                               <img
+                          src={person.foto}
+                          alt={person.nome}
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover',
+                            minWidth: '100%',
+                            minHeight: '100%',
+                            maxWidth: '100%',
+                            maxHeight: '100%'
+                          }}
+                          crossOrigin="anonymous"
                          onError={(e) => {
                            const target = e.target as HTMLImageElement;
                            target.style.display = 'none';
-                           target.nextElementSibling?.classList.remove('hidden');
+                           const sibling = target.nextElementSibling as HTMLElement;
+                           if (sibling) {
+                             sibling.style.display = 'flex';
+                           }
                          }}
                        />
                      ) : null}
-                     <div className={`w-full h-full flex items-center justify-center ${person.foto ? 'hidden' : ''}`} style={{ backgroundColor: '#f3f4f6' }}>
-                       <span className="text-lg" style={{ color: '#6b7280' }}>SEM FOTO</span>
+                     <div style={{ 
+                       width: '100%', 
+                       height: '100%', 
+                       display: person.foto ? 'none' : 'flex', 
+                       alignItems: 'center', 
+                       justifyContent: 'center',
+                       backgroundColor: '#f3f4f6' 
+                     }}>
+                       <span style={{ fontSize: '18px', color: '#6b7280' }}>SEM FOTO</span>
                      </div>
                    </div>
                    
                                        {/* Nome e idade - próximo da foto */}
-                    <div className="text-center mb-4">
-                      <h2 className="text-xl font-bold mb-1" style={{ color: '#111827' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                      <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '4px', color: '#111827' }}>
                         {person.nome.toUpperCase()}
                       </h2>
-                      <div className="text-lg" style={{ color: '#374151' }}>
+                      <div style={{ fontSize: '18px', color: '#374151' }}>
                         {person.idade && `${person.idade} ANOS`}
                       </div>
                     </div>
                  </div>
 
                  {/* Coluna Direita - Informações e QR Code */}
-                 <div className="flex flex-col justify-between">
+                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                                        {/* Informações - alinhadas ao topo da foto */}
-                    <div className="space-y-4 mt-0">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: 0 }}>
                                             <div>
-                         <span className="font-bold text-lg" style={{ color: '#1f2937' }}>Bairro/Cidade:</span>
-                         <div className="text-base mt-1" style={{ color: '#374151' }}>
+                         <span style={{ fontWeight: 'bold', fontSize: '18px', color: '#1f2937' }}>Bairro/Cidade:</span>
+                         <div style={{ fontSize: '16px', marginTop: '4px', color: '#374151' }}>
                            {person.localDesaparecimentoConcat || 'NÃO INFORMADO'}
                          </div>
                        </div>
 
                        <div>
-                         <span className="font-bold text-lg" style={{ color: '#1f2937' }}>Informações:</span>
-                         <div className="text-base mt-1" style={{ color: '#374151' }}>
+                         <span style={{ fontWeight: 'bold', fontSize: '18px', color: '#1f2937' }}>Informações:</span>
+                         <div style={{ fontSize: '16px', marginTop: '4px', color: '#374151' }}>
                            {person.ultimaOcorrencia || 'INFORMAÇÕES NÃO DISPONÍVEIS'}
                          </div>
                        </div>
 
                        <div>
-                         <span className="font-bold text-lg" style={{ color: '#1f2937' }}>Vestimentas:</span>
-                         <div className="text-base mt-1" style={{ color: '#374151' }}>
+                         <span style={{ fontWeight: 'bold', fontSize: '18px', color: '#1f2937' }}>Vestimentas:</span>
+                         <div style={{ fontSize: '16px', marginTop: '4px', color: '#374151' }}>
                            INFORMAÇÕES NÃO DISPONÍVEIS
                          </div>
                        </div>
 
-                     {qrCodeUrl && (
-                       <div className="text-center mt-20">
-                         <img
-                           src={qrCodeUrl}
-                           alt="QR Code"
-                           className="w-30 h-30 mb-1 mx-auto"
-                         />
-                         <div className="text-xs font-medium" style={{ color: '#4b5563' }}>
-                           Escaneie para mais informações
-                         </div>
-                       </div>
-                     )}
+                                           <div style={{ textAlign: 'center', marginTop: '80px' }}>
+                        {isClient && qrCodeUrl ? (
+                          <>
+                            <img
+                              src={qrCodeUrl}
+                              alt="QR Code"
+                              style={{ 
+                                width: '120px', 
+                                height: '120px', 
+                                marginBottom: '4px', 
+                                margin: '0 auto',
+                                minWidth: '120px',
+                                minHeight: '120px',
+                                maxWidth: '120px',
+                                maxHeight: '120px'
+                              }}
+                            />
+                            <div style={{ fontSize: '12px', fontWeight: '500', color: '#4b5563' }}>
+                              Escaneie para mais informações
+                            </div>
+                          </>
+                        ) : (
+                          <div style={{ width: '120px', height: '120px', marginBottom: '4px', margin: '0 auto', backgroundColor: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
+                            <span style={{ fontSize: '12px', color: '#6b7280' }}>Carregando QR...</span>
+                          </div>
+                        )}
+                      </div>
                    </div>
 
                    {/* QR Code abaixo das vestimentas */}
@@ -212,16 +294,17 @@ export function PosterGenerator({ person, isOpen, onClose }: PosterGeneratorProp
 
 
 
-                <div className="text-center mt-2 text-sm border-t  mt-8 pt-2" style={{ color: '#4b5563', borderColor: '#d1d5db' }}>
+                <div style={{ textAlign: 'center', fontSize: '14px', borderTop: '1px solid #d1d5db', marginTop: '32px', paddingTop: '8px', color: '#4b5563' }}>
                   Denúncias / Contato: Núcleo de Pessoas Desaparecidas DHPP / PJC
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-center gap-4 p-3 rounded-lg" style={{ backgroundColor: '#059669', color: '#ffffff' }}>
-                <WhatsappLogoIcon weight="fill" size={22} className="text-white" />
-                <span className="text-xl font-bold">65 99999-8888</span>
-              </div>
+                                                  <div style={{ backgroundColor: '#059669', padding: '12px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+               <div style={{ color: '#ffffff', fontSize: '20px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', margin: 0, lineHeight: '1' }}>      
+               <Phone size={24} style={{ color: '#ffffff', display: 'inline-block', verticalAlign: 'middle' }} />           
+                 <span style={{ color: '#ffffff', display: 'inline-block', verticalAlign: 'middle' }}>65 9999-9999</span></div>
+             </div>
             </div>
           </div>
         </div>

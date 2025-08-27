@@ -1,0 +1,200 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: #171717;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #f5f5f5;
+  --accent-foreground: #171717;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #171717;
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-encode-sans);
+  --font-mono: var(--font-encode-sans);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --card: #0a0a0a;
+    --card-foreground: #ededed;
+    --popover: #0a0a0a;
+    --popover-foreground: #ededed;
+    --primary: #ededed;
+    --primary-foreground: #0a0a0a;
+    --secondary: #1a1a1a;
+    --secondary-foreground: #ededed;
+    --muted: #1a1a1a;
+    --muted-foreground: #a3a3a3;
+    --accent: #1a1a1a;
+    --accent-foreground: #ededed;
+    --destructive: #7f1d1d;
+    --destructive-foreground: #ededed;
+    --border: #262626;
+    --input: #262626;
+    --ring: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-encode-sans), 'Encode Sans', Arial, Helvetica, sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Utilitários adicionais */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Estilos específicos para o sistema de desaparecidos */
+.font-encode-sans {
+  font-family: var(--font-encode-sans), 'Encode Sans', Arial, Helvetica, sans-serif;
+}
+
+/* Cores específicas do sistema */
+.text-yellow-400 {
+  color: #877a4e;
+}
+
+.bg-yellow-400 {
+  background-color: #877a4e;
+}
+
+.border-yellow-400 {
+  border-color: #877a4e;
+}
+
+.hover\:bg-yellow-500:hover {
+  background-color: #6b6140;
+}
+
+.hover\:text-yellow-400:hover {
+  color: #877a4e;
+}
+
+.hover\:border-yellow-400:hover {
+  border-color: #877a4e;
+}
+
+/* Variações adicionais de yellow */
+.text-yellow-500 {
+  color: #6b6140;
+}
+
+.text-yellow-600 {
+  color: #5a5035;
+}
+
+.bg-yellow-50 {
+  background-color: #fefdf9;
+}
+
+.bg-yellow-100 {
+  background-color: #fdfbf2;
+}
+
+.bg-yellow-300 {
+  background-color: #f2e9c5;
+}
+
+.bg-yellow-500 {
+  background-color: #6b6140;
+}
+
+.hover\:bg-yellow-300:hover {
+  background-color: #f2e9c5;
+}
+
+/* Gradientes customizados */
+.from-yellow-400 {
+  --tw-gradient-from: #877a4e;
+  --tw-gradient-to: rgb(135 122 78 / 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.to-yellow-500 {
+  --tw-gradient-to: #6b6140;
+}
+
+/* Background espelhado para o hero */
+.hero-mirrored-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-mirrored-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/bg-hero.jpg');
+  background-size: auto 100%;
+  background-repeat: repeat-x;
+  background-position: center;
+  transform: scaleX(-1);
+  z-index: -2;
+}
+
+.hero-mirrored-bg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/bg-hero.jpg');
+  background-size: auto 100%;
+  background-repeat: repeat-x;
+  background-position: center;
+  z-index: -1;
+}
+
+/* Overlay para o hero */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
+  z-index: 0;
+}
+
+/* Conteúdo do hero */
+.hero-content {
+  position: relative;
+  z-index: 1;
+}

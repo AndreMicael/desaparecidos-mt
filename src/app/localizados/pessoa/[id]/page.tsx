@@ -1,0 +1,437 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import { Person } from '@/types/person';
+import { toast } from 'sonner';
+import { Loader2, ArrowLeft, Phone, Mail, MapPin, Calendar, FileImage } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { InstagramLogoIcon, WhatsappLogo } from '@phosphor-icons/react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Lazy loading dos componentes
+const Button = dynamic(() => import('@/components/ui/button').then(mod => ({ default: mod.Button })), {
+  ssr: false
+});
+
+const Toaster = dynamic(() => import('@/components/ui/sonner').then(mod => ({ default: mod.Toaster })), {
+  ssr: false
+});
+
+export default function LocalizadoPage() {
+  const params = useParams();
+  const router = useRouter();
+  const [person, setPerson] = useState<Person | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const personId = params.id as string;
+
+  useEffect(() => {
+    loadPerson();
+  }, [personId]);
+
+  const loadPerson = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`/api/pessoas/${personId}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          setError('Pessoa não encontrada');
+        } else {
+          throw new Error(`Erro na API: ${response.status}`);
+        }
+        return;
+      }
+
+      const result = await response.json();
+      setPerson(result.data);
+    } catch (error) {
+      console.error('Erro ao carregar pessoa:', error);
+      setError('Erro ao carregar dados da pessoa');
+      toast.error('Erro ao carregar dados.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBack = () => {
+    router.back();
+  };
+
+  const handleShare = (platform: 'whatsapp' | 'instagram') => {
+    const text = `✅ PESSOA LOCALIZADA: ${person?.nome}\n📅 Desde: ${person?.dtDesaparecimento ? new Date(person.dtDesaparecimento).toLocaleDateString('pt-BR') : 'Data não informada'}\n📍 Local: ${person?.localDesaparecimentoConcat || 'Não informado'}\n\nEsta pessoa foi localizada com sucesso pela Polícia Civil de Mato Grosso!`;
+    
+    if (platform === 'whatsapp') {
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      window.open(whatsappUrl, '_blank');
+    } else if (platform === 'instagram') {
+      // Para Instagram, copiamos o texto para a área de transferência
+      navigator.clipboard.writeText(text).then(() => {
+        toast.success('Texto copiado! Cole no Instagram para compartilhar.');
+      });
+    }
+  };
+
+  const daysSinceDisappearance = person?.dtDesaparecimento 
+    ? Math.floor((new Date().getTime() - new Date(person.dtDesaparecimento).getTime()) / (1000 * 3600 * 24))
+    : null;
+
+  if (loading) {
+    return (
+      <motion.div 
+        className="min-h-screen bg-white flex items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        <motion.div 
+          className="text-center"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          >
+            <Loader2 className="w-8 h-8 text-yellow-500 mx-auto mb-4" />
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
+  if (error || !person) {
+    return (
+      <motion.div 
+        className="min-h-screen bg-white flex items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        <motion.div 
+          className="text-center"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            {error || 'Pessoa não encontrada'}
+          </h1>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button onClick={handleBack} className="bg-yellow-400 text-black hover:bg-yellow-500">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div 
+      className="min-h-screen bg-gray-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Header com botão voltar */}
+      <motion.div 
+        className="bg-white border-b border-gray-200"
+        initial={{ y: -10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <div className="max-w-4xl mx-auto px-4 py-3">
+          <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+            <Button
+              onClick={handleBack}
+              variant="ghost"
+              className="text-gray-700 hover:bg-gray-50 border border-gray-300 hover:border-gray-400"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Main Content */}
+      <div className="py-4 md:py-8">
+        <div className="max-w-4xl mx-auto px-3 md:px-4">
+          {/* Card Principal */}
+          <motion.div 
+            className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <div className="p-4 md:p-6">
+              <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
+                {/* Photo */}
+                <div className="w-32 h-32 bg-gray-200 rounded-lg overflow-hidden">
+                  <ImageWithFallback
+                    src={person.foto}
+                    alt={person.nome}
+                    className="w-full h-full object-cover"
+                    containerClassName="w-full h-full"
+                    placeholder={
+                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                        <img 
+                          src="/sem-foto.svg" 
+                          alt="Sem foto disponível"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    }
+                  />
+                </div>
+
+                {/* Informações */}
+                <motion.div 
+                  className="flex-1 space-y-3 md:space-y-4"
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  {/* Badge de Status */}
+                  <motion.div 
+                    className="flex justify-center lg:justify-start"
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.4, delay: 0.5 }}
+                  >
+                    <span className="bg-gray-800 text-white px-3 py-1 text-xs sm:text-sm font-medium rounded-sm uppercase tracking-wide">
+                      Localizado
+                    </span>
+                  </motion.div>
+
+                  {/* Nome */}
+                  <motion.div 
+                    className="text-center lg:text-left"
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                  >
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900 mb-1">
+                      {person.nome}
+                    </h1>
+                    <p className="text-gray-600 text-base sm:text-lg font-light">
+                      {person.idade && `${person.idade} anos`} {person.idade && person.sexo && ' • '} 
+                      {person.sexo && <span className="capitalize">{person.sexo}</span>}
+                    </p>
+                  </motion.div>
+
+                  {/* Dados sobre o Desaparecimento */}
+                  <motion.div 
+                    className="space-y-4 border-t border-gray-100 pt-4"
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.7 }}
+                  >
+                    <h3 className="text-base sm:text-lg font-medium text-gray-900 text-center lg:text-left">
+                      Informações do Desaparecimento
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 gap-3 text-sm">
+                      {person.dtDesaparecimento && (
+                        <motion.div 
+                          className="flex items-start gap-3 text-center lg:text-left"
+                          initial={{ x: -10, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{ duration: 0.4, delay: 0.8 }}
+                        >
+                          <svg className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <div>
+                            <span className="font-medium text-gray-700">Data:</span>
+                            <span className="ml-2 text-gray-600">{new Date(person.dtDesaparecimento).toLocaleDateString('pt-BR')}</span>
+                          </div>
+                        </motion.div>
+                      )}
+                      {person.localDesaparecimentoConcat && (
+                        <motion.div 
+                          className="flex items-start gap-3 text-center lg:text-left"
+                          initial={{ x: -10, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{ duration: 0.4, delay: 0.9 }}
+                        >
+                          <svg className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <div>
+                            <span className="font-medium text-gray-700">Local:</span>
+                            <span className="ml-2 text-gray-600">{person.localDesaparecimentoConcat.charAt(0).toUpperCase() + person.localDesaparecimentoConcat.slice(1)}</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {person.ultimaOcorrencia && (
+                      <motion.div 
+                        className="text-center lg:text-left"
+                        initial={{ y: 10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.4, delay: 1.0 }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <svg className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <div>
+                            <span className="font-medium text-gray-700">Informações adicionais:</span>
+                            <p className="mt-1 text-gray-600 leading-relaxed text-sm">
+                              {person.ultimaOcorrencia}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </motion.div>
+
+                  {/* Badge de dias desaparecido */}
+                  {daysSinceDisappearance && (
+                    <motion.div 
+                      className="bg-gray-100 border border-gray-300 rounded-sm p-3"
+                      initial={{ scale: 0.95, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.4, delay: 1.1 }}
+                    >
+                      <div className="flex items-center gap-2 justify-center lg:justify-start">
+                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="text-gray-700 font-medium text-sm sm:text-base text-center lg:text-left">
+                          Desaparecido há {daysSinceDisappearance} dias
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Mensagem de Sucesso */}
+                  <motion.div 
+                    className="pt-4 border-t border-gray-100"
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 1.2 }}
+                  >
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-4">
+                      <div className="flex items-center gap-3">
+                        <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                          <p className="text-yellow-800 font-medium text-sm sm:text-base">
+                            ✅ Esta pessoa foi localizada com sucesso e retornou para sua família!
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Compartilhar sucesso */}
+                  <motion.div 
+                    className="pt-4 border-t border-gray-100"
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 1.3 }}
+                  >
+                    <h4 className="text-base font-medium text-gray-900 mb-3 text-center lg:text-left">
+                      Compartilhar a boa notícia
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                        <Button
+                          onClick={() => handleShare('whatsapp')}
+                          variant="outline"
+                          className="w-full cursor-pointer border-gray-300 text-white hover:outline-2 hover:outline-black hover:text-black hover:bg-gray-50 hover:border-gray-400 font-normal py-2.5 px-4 rounded-sm text-sm transition-colors duration-200"
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                           <WhatsappLogo size={22} />
+                            WhatsApp
+                          </div>
+                        </Button>
+                      </motion.div>
+                      
+                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                        <Button
+                          onClick={() => handleShare('instagram')}
+                          variant="outline"
+                          className="w-full cursor-pointer border-gray-300 text-white
+                           hover:text-black hover:bg-gray-50 hover:outline-2 hover:outline-black font-normal py-2.5 px-4 rounded-sm text-sm transition-colors duration-200"
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                           <InstagramLogoIcon size={22} weight="bold" />
+                            Instagram
+                          </div>
+                        </Button>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Seção de Contato */}
+          <motion.div 
+            className="mt-6 sm:mt-8 bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-6"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 1.4 }}
+          >
+            <h3 className="text-lg font-medium text-gray-900 mb-4 text-center sm:text-left">
+              Informações de Contato
+            </h3>
+            <div className="bg-gray-50 border border-gray-200 rounded-sm p-4">
+              <p className="text-gray-700 mb-4 text-sm sm:text-base text-center sm:text-left">
+                Para mais informações sobre casos de pessoas desaparecidas:
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <motion.div 
+                  className="flex items-center gap-3 text-gray-700 justify-center sm:justify-start"
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 1.5 }}
+                  whileHover={{ scale: 1.01 }}
+                >
+                  <svg className="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <div className="text-center sm:text-left">
+                    <p className="font-medium text-sm sm:text-base text-gray-900">197 - Polícia Civil</p>
+                    <p className="text-xs sm:text-sm text-gray-600">Disque Denúncia</p>
+                  </div>
+                </motion.div>
+                <motion.div 
+                  className="flex items-center gap-3 text-gray-700 justify-center sm:justify-start"
+                  initial={{ x: 10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 1.6 }}
+                  whileHover={{ scale: 1.01 }}
+                >
+                  <svg className="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <div className="text-center sm:text-left">
+                    <p className="font-medium text-xs sm:text-sm text-gray-900 break-all">desaparecidos@policiacivil.mt.gov.br</p>
+                    <p className="text-xs sm:text-sm text-gray-600">E-mail oficial</p>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+      <Toaster position="top-right" />
+    </motion.div>
+  );
+}

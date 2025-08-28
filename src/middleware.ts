@@ -2,36 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // Verificar se é uma rota de paginação inválida para /todos
-  if (pathname.match(/^\/todos\/(\d+)$/)) {
-    const page = parseInt(pathname.split('/')[2]);
-    
-    // Se a página for 1, redirecionar para a raiz
-    if (page === 1) {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
-    
-    // Se a página for 0 ou negativa, redirecionar para a raiz
-    if (page <= 0) {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
-  }
-
-  // Verificar se é uma rota de paginação inválida para localizados
-  if (pathname.match(/^\/localizados\/(\d+)$/)) {
-    const page = parseInt(pathname.split('/')[2]);
-    
-    // Se a página for 1, redirecionar para /localizados
-    if (page === 1) {
-      return NextResponse.redirect(new URL('/localizados', request.url));
-    }
-    
-    // Se a página for 0 ou negativa, redirecionar para /localizados
-    if (page <= 0) {
-      return NextResponse.redirect(new URL('/localizados', request.url));
-    }
+  // Proteger rotas do admin (opcional para fins didáticos)
+  if (request.nextUrl.pathname.startsWith('/admin/dashboard')) {
+    // Em produção, você verificaria um token JWT real
+    // Por enquanto, vamos permitir acesso direto
+    return NextResponse.next();
   }
 
   return NextResponse.next();

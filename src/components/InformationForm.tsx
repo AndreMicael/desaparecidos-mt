@@ -112,8 +112,27 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
     setIsSubmitting(true);
 
     try {
-      // Upload das fotos (simulado - em produção você faria upload para um servidor)
-      const photoUrls = photos.map((_, index) => `/uploads/photo-${Date.now()}-${index}.jpg`);
+      // Upload real das fotos
+      let photoUrls: string[] = [];
+      
+      if (photos.length > 0) {
+        const formData = new FormData();
+        photos.forEach(photo => {
+          formData.append('photos', photo);
+        });
+
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Erro no upload das fotos');
+        }
+
+        const uploadResult = await uploadResponse.json();
+        photoUrls = uploadResult.files || [];
+      }
 
       const response = await fetch('/api/informations', {
         method: 'POST',

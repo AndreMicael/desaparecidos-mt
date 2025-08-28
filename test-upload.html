@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste de Upload</title>
+</head>
+<body>
+    <h2>Teste de Upload de Fotos</h2>
+    <form id="uploadForm">
+        <input type="file" multiple accept="image/*" id="photoInput">
+        <button type="submit">Upload</button>
+    </form>
+    
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const files = document.getElementById('photoInput').files;
+            if (files.length === 0) {
+                alert('Selecione pelo menos uma foto');
+                return;
+            }
+
+            const formData = new FormData();
+            for (const file of files) {
+                formData.append('photos', file);
+            }
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                document.getElementById('result').innerHTML = 
+                    `<h3>Resultado:</h3><pre>${JSON.stringify(result, null, 2)}</pre>`;
+                    
+                if (result.files) {
+                    result.files.forEach(file => {
+                        const img = document.createElement('img');
+                        img.src = file;
+                        img.style.width = '200px';
+                        img.style.margin = '10px';
+                        document.getElementById('result').appendChild(img);
+                    });
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    `<h3>Erro:</h3><p>${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,145 +1,350 @@
 # Sistema de Pessoas Desaparecidas – Polícia Civil MT
 
-Documentação do projeto `desaparecidos-mt`, desenvolvido com foco em performance, acessibilidade e fidelidade visual ao protótipo fornecido. Esta aplicação não possui autenticação e concentra-se na busca e divulgação de informações de pessoas desaparecidas.
+Sistema completo para divulgação e gerenciamento de informações sobre pessoas desaparecidas, desenvolvido com Next.js, TypeScript e MySQL. O projeto inclui área pública para busca e submissão de informações, e área administrativa para gerenciamento.
 
-## Sumário
+## 🚀 Funcionalidades Principais
+
+### Área Pública
+- **Busca avançada** de pessoas desaparecidas e localizadas
+- **Visualização detalhada** de cada pessoa com fotos e informações
+- **Formulário de informações** para cidadãos reportarem avistamentos
+- **Upload de fotos** como evidência de avistamentos
+- **Interface responsiva** e acessível
+- **Animações suaves** com Framer Motion
+
+### Área Administrativa
+- **Dashboard completo** para administradores
+- **Sistema de login** simples (admin/admin)
+- **Gerenciamento de informações** submetidas pelos cidadãos
+- **Sistema de arquivamento** de informações processadas
+- **Visualização de anexos** enviados pelos usuários
+- **Estatísticas em tempo real**
+
+## 📋 Sumário
 - [Tecnologias](#tecnologias)
-- [Pré‑requisitos](#pré-requisitos)
+- [Pré-requisitos](#pré-requisitos)
+- [Configuração do Banco](#configuração-do-banco)
 - [Como rodar o projeto](#como-rodar-o-projeto)
-- [Scripts disponíveis](#scripts-disponíveis)
-- [Estrutura de pastas](#estrutura-de-pastas)
-- [Arquitetura e principais componentes](#arquitetura-e-principais-componentes)
-- [Estilos, tema e fonte](#estilos-tema-e-fonte)
-- [Background do Hero](#background-do-hero)
-- [Mock API e modelos](#mock-api-e-modelos)
-- [Boas práticas de desenvolvimento](#boas-práticas-de-desenvolvimento)
-- [Pendências e próximos passos](#pendências-e-próximos-passos)
-- [Dúvidas comuns (FAQ)](#dúvidas-comuns-faq)
+- [Funcionalidades](#funcionalidades)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [APIs disponíveis](#apis-disponíveis)
+- [Sistema administrativo](#sistema-administrativo)
+- [Deploy e produção](#deploy-e-produção)
 
 ---
 
-## Tecnologias
-- Next.js 15 (App Router)
-- TypeScript
-- Tailwind CSS (com tokens CSS customizados)
-- Lucide React (ícones)
-- Sonner (toasts)
-- Radix UI primitives (Checkbox/Slot)
-- Utilitários: `class-variance-authority`, `clsx`, `tailwind-merge`
+## 🛠️ Tecnologias
 
-## Pré-requisitos
-- Node.js 18+ (recomendado LTS)
-- npm 9+ (ou yarn/pnpm/bun, se preferir)
+### Frontend
+- **Next.js 15** (App Router) - Framework React
+- **TypeScript** - Tipagem estática
+- **Tailwind CSS** - Estilização e design system
+- **Framer Motion** - Animações suaves
+- **Lucide React** - Ícones modernos
+- **Sonner** - Notificações toast
 
-## Como rodar o projeto
-1. Acesse a pasta do projeto (importante: entre na subpasta `desaparecidos-mt`):
-```powershell
-cd desaparecidos-mt
+### Backend
+- **MySQL** - Banco de dados principal
+- **Prisma** - ORM para gerenciamento do banco
+- **Next.js API Routes** - Endpoints da aplicação
+
+### Integração Externa
+- **API Abitus** - Fonte de dados das pessoas desaparecidas
+
+### Utilitários
+- **Radix UI** - Componentes primitivos acessíveis
+- **class-variance-authority** - Variantes de componentes
+- **clsx** & **tailwind-merge** - Manipulação de classes CSS
+
+## 📋 Pré-requisitos
+- **Node.js 18+** (recomendado LTS)
+- **npm 9+** (ou yarn/pnpm/bun)
+- **MySQL 8.0+** - Banco de dados
+
+## 🗃️ Configuração do Banco
+
+### Variáveis de Ambiente
+Crie um arquivo `.env` na raiz do projeto:
+```env
+DATABASE_URL="mysql://usuario:senha@host:porta/database"
 ```
-2. Instale as dependências:
+
+### Estrutura do Banco
+O sistema criará automaticamente as seguintes tabelas:
+- `informations` - Informações submetidas pelos cidadãos
+- `photos` - Metadados das fotos (opcional para expansão futura)
+
+### Campos da Tabela `informations`:
+- `id` - Identificador único
+- `personId` - ID da pessoa desaparecida
+- `informantName` - Nome do informante
+- `informantPhone` - Telefone (opcional)
+- `informantEmail` - Email (opcional)
+- `sightingDate` - Data do avistamento
+- `sightingLocation` - Local do avistamento
+- `description` - Descrição detalhada
+- `photos` - URLs das fotos (separadas por vírgula)
+- `archived` - Status de arquivamento
+- `archivedAt` - Data do arquivamento
+- `createdAt` / `updatedAt` - Timestamps
+
+## 🚀 Como rodar o projeto
+
+### 1. Clone e acesse o projeto
+```bash
+git clone [url-do-repositorio]
+cd desaparecidos/desaparecidos-mt
+```
+
+### 2. Instale as dependências
 ```bash
 npm install
 ```
-3. Rode o servidor de desenvolvimento:
+
+### 3. Configure o banco de dados
+```bash
+# Configure suas variáveis de ambiente no arquivo .env
+DATABASE_URL="mysql://usuario:senha@host:porta/database"
+```
+
+### 4. Execute o servidor de desenvolvimento
 ```bash
 npm run dev
 ```
-4. Abra o navegador em `http://localhost:3000` (ou a porta exibida no terminal).
 
-> Dica (Windows/PowerShell): evite usar `cd projeto && npm run dev`. Use comandos separados se o PowerShell não aceitar `&&`.
+### 5. Acesse a aplicação
+- **Área pública**: `http://localhost:3000`
+- **Área administrativa**: `http://localhost:3000/admin/login`
+  - **Login**: admin
+  - **Senha**: admin
 
-## Scripts disponíveis
-- `npm run dev`: inicia o ambiente de desenvolvimento.
-- `npm run build`: gera a aplicação para produção.
-- `npm run start`: inicia o servidor após o build.
+## 📜 Scripts disponíveis
+- `npm run dev` - Ambiente de desenvolvimento
+- `npm run build` - Build para produção
+- `npm run start` - Servidor de produção
+- `npm run lint` - Verificação de código
+- `npm run test` - Execução de testes
 
-## Estrutura de pastas
+## 📁 Estrutura do projeto
+
 ```text
 src/
   app/
-    page.tsx           # Ponto de entrada, renderiza a HomePage
-    layout.tsx         # Define a fonte Encode Sans e importa os estilos globais
-    globals.css        # Tokens de tema (CSS variables) e utilitários
+    admin/                    # Área administrativa
+      dashboard/page.tsx      # Dashboard com gerenciamento
+      login/page.tsx          # Página de login
+    api/                      # Endpoints da aplicação
+      admin/informations/     # APIs administrativas
+      pessoas/                # API de pessoas desaparecidas
+      upload/                 # Upload de arquivos
+      informations/           # Submissão de informações
+    desaparecidos/pessoa/[id]/ # Detalhes de pessoa desaparecida
+    localizados/pessoa/[id]/   # Detalhes de pessoa localizada
+    como-ajudar/              # Página informativa
+    contato/                  # Página de contato
+    page.tsx                  # Página inicial
+    layout.tsx                # Layout principal
+    globals.css               # Estilos globais
+  
   components/
-    HomePage.tsx       # Orquestra a página inicial (busca, paginação, abas)
-    Header.tsx         # Cabeçalho com contatos e menu
-    HeroSection.tsx    # Banner com imagem de fundo e formulário compacto
-    SearchForm.tsx     # Formulário (nome, idade, sexo, status)
-    PersonCard.tsx     # Card de pessoa
-    Footer.tsx         # Rodapé com parceiros e contatos
-    ui/                # Componentes de UI reutilizáveis (Button, Input, etc.)
-  services/
-    api.ts             # Mock API (busca/estatísticas)
+    Header.tsx                # Cabeçalho com login/logout
+    HeroSection.tsx           # Banner principal
+    HomePage.tsx              # Página inicial
+    SearchForm.tsx            # Formulário de busca
+    PersonCard.tsx            # Card de pessoa
+    InformationForm.tsx       # Formulário de informações
+    Footer.tsx                # Rodapé
+    ui/                       # Componentes reutilizáveis
+  
   types/
-    person.ts          # Tipos: Person, SearchFilters, etc.
+    person.ts                 # Tipos TypeScript
+
 public/
-  bg-hero.jpg          # Imagem do herói (banner)
-  *.svg                # Ícones estáticos
+  infos/                      # Fotos enviadas pelos usuários
+  bg-hero.jpg                 # Imagem de fundo
+  *.svg                       # Ícones e logos
+
+prisma/
+  schema.prisma               # Esquema do banco de dados
 ```
 
-## Arquitetura e principais componentes
-- `src/app/page.tsx`: componente client que apenas delega para `HomePage` e registra o `Toaster`.
-- `src/components/HomePage.tsx`:
-  - Integra o `Header`, `HeroSection`, `SearchForm`, `PersonCard` e `Footer`.
-  - Controla tabs (Desaparecidos/Localizados/Como Ajudar/Contato), busca, paginação e estatísticas.
-- `src/components/HeroSection.tsx`:
-  - Exibe título, subtítulo, cartões de estatística e o formulário de busca compacto.
-  - Usa `bg-hero.jpg` como plano de fundo.
-- `src/components/SearchForm.tsx`:
-  - Campos: nome, idade mínima/máxima, sexo (masculino/feminino) e status (desaparecido/localizado).
-  - Ações: Buscar e Limpar.
-- `src/components/PersonCard.tsx`:
-  - Mostra foto, nome, idade estimada, sexo, datas e local.
-  - Badge de status (Desaparecido/Localizado).
-- `src/services/api.ts` (mock):
-  - `searchPersons({ page, pageSize, filters })`
-  - `getPersonStatistics()`
+## 🔧 Funcionalidades
 
-## Estilos, tema e fonte
-- A fonte padrão do projeto é **Encode Sans**, carregada via `next/font` em `src/app/layout.tsx`:
-  - A classe global `font-sans` e a utilitária `font-encode-sans` usam a variável `--font-encode-sans`.
-- Tokens de tema em `globals.css` (modo claro/escuro por CSS variables). Principais tokens:
-  - `--background`, `--foreground`, `--primary`, `--secondary`, `--border`, etc.
-- Tailwind configurado em `tailwind.config.ts` com `@tailwindcss/line-clamp` para truncar textos.
+### Área Pública
 
-## Background do Hero
-- Arquivo: `public/bg-hero.jpg`.
-- Implementação atual (simplificada e performática):
-  - Repetição horizontal (`repeat-x`).
-  - Overlay escuro para garantir legibilidade.
-- Para trocar a imagem, substitua `public/bg-hero.jpg` mantendo o mesmo nome/razão de aspecto.
+#### Busca e Navegação
+- **Busca por nome** com ignore de acentos
+- **Filtros avançados** (idade, sexo, status)
+- **Paginação inteligente** com navegação
+- **Busca rápida** disponível em todas as páginas
+- **Interface responsiva** para todos os dispositivos
 
-## Mock API e modelos
-- Tipos em `src/types/person.ts`:
-  - `Person`: estrutura base da pessoa.
-  - `SearchFilters`: filtros do formulário de busca.
-  - `Statistics`: totais exibidos no banner.
-- Os dados vêm de `src/services/api.ts` (simulado). Para integrar com uma API real:
-  1. Crie variáveis de ambiente (`.env.local`) com a URL base do backend.
-  2. Substitua as funções do mock por `fetch`/`axios` no serviço.
-  3. Garanta que os tipos de resposta coincidam com os modelos do front.
+#### Visualização de Pessoas
+- **Cards informativos** com foto e dados principais
+- **Páginas de detalhes** completas para cada pessoa
+- **Distinção visual** entre desaparecidos e localizados
+- **Animações suaves** em todas as interações
 
-## Boas práticas de desenvolvimento
-- Componentes client-only devem iniciar com `"use client"`.
-- Prefira componentes reutilizáveis em `src/components/ui`.
-- Use `clsx`/`tailwind-merge` para classes condicionais (helper `cn`).
-- Ícones via `lucide-react` para consistência visual.
-- Toasters via `sonner` (tema claro por padrão).
-- Mantenha nomes explícitos e código legível (Clean Code).
+#### Formulário de Informações
+- **Campos obrigatórios**: Nome, local e descrição
+- **Campos opcionais**: Telefone, email, data do avistamento
+- **Upload de fotos** (até 5 imagens por formulário)
+- **Máscaras automáticas** para telefone e data
+- **Opção de anonimato** com controle de privacidade
+- **Validação em tempo real** dos dados
 
-## Pendências e próximos passos
-- Página de detalhes da pessoa (`PersonDetail`) e navegação ao clicar no card.
-- Componente de mapa de proximidade (presente no protótipo) ainda não implementado.
-- Integração com API real da instituição (quando disponível).
+### Área Administrativa
 
-## Dúvidas comuns (FAQ)
-- "Ao rodar `npm run dev` aparece ENOENT package.json":
-  - Certifique-se de que você está dentro da pasta `desaparecidos-mt` antes de rodar o comando.
-- "PowerShell não aceita `&&`":
-  - Execute os comandos em linhas separadas: `cd desaparecidos-mt` e depois `npm run dev`.
-- "Toast falha por `next-themes` não encontrado":
-  - O projeto usa `Sonner` em tema fixo claro; não é necessário `next-themes`.
+#### Sistema de Login
+- **Login simples** para fins didáticos (admin/admin)
+- **Detecção automática** do status de login
+- **Botão dinâmico** no header (Login/Logout)
+- **Redirecionamento seguro** para páginas protegidas
+
+#### Dashboard de Gerenciamento
+- **Visualização completa** de todas as informações
+- **Estatísticas em tempo real** (total, pessoas únicas, hoje)
+- **Sistema de abas** (Ativas/Arquivadas)
+- **Busca e filtros** por pessoa ou conteúdo
+- **Visualização de anexos** em modal interativo
+
+#### Gerenciamento de Informações
+- **Cards organizados** com foto da pessoa desaparecida
+- **Dados completos** do informante e avistamento
+- **Botões de ação** para arquivar/desarquivar
+- **Contador automático** por categoria
+- **Preservação de filtros** entre abas
+
+## 🌐 APIs disponíveis
+
+### Públicas
+- `GET /api/pessoas` - Lista pessoas com filtros e paginação
+- `GET /api/pessoas/[id]` - Detalhes de uma pessoa específica
+- `GET /api/estatisticas` - Estatísticas gerais do sistema
+- `POST /api/informations` - Submissão de novas informações
+- `POST /api/upload` - Upload de fotos para a pasta `public/infos`
+
+### Administrativas
+- `GET /api/admin/informations` - Lista todas as informações submetidas
+- `PATCH /api/admin/informations/[id]/archive` - Arquiva/desarquiva informação
+
+### Parâmetros de Busca
+```typescript
+// Filtros disponíveis na API de pessoas
+{
+  nome?: string;           // Nome da pessoa
+  idadeMinima?: string;    // Idade mínima
+  idadeMaxima?: string;    // Idade máxima
+  sexos?: string[];        // Array: ['masculino', 'feminino']
+  status?: string[];       // Array: ['desaparecido', 'localizado']
+  page?: number;           // Página atual
+  pageSize?: number;       // Itens por página
+}
+```
+
+## 🛡️ Sistema administrativo
+
+### Credenciais Padrão
+- **Usuário**: admin
+- **Senha**: admin
+
+### Funcionalidades do Dashboard
+1. **Estatísticas em Tempo Real**
+   - Total de informações recebidas
+   - Número de pessoas únicas com informações
+   - Informações recebidas hoje
+
+2. **Gerenciamento por Abas**
+   - **Ativas**: Informações não processadas
+   - **Arquivadas**: Informações já processadas
+
+3. **Visualização Detalhada**
+   - Foto da pessoa desaparecida
+   - Dados completos do informante
+   - Detalhes do avistamento
+   - Galeria de fotos anexadas
+
+4. **Ações Disponíveis**
+   - Arquivar informação processada
+   - Desarquivar se necessário
+   - Visualizar anexos em modal
+   - Buscar e filtrar informações
+
+## 🚀 Deploy e produção
+
+### Variáveis de Ambiente Necessárias
+```env
+# Banco de dados
+DATABASE_URL="mysql://usuario:senha@host:porta/database"
+
+# URLs da aplicação (opcional para produção)
+NEXT_PUBLIC_APP_URL="https://seudominio.com"
+```
+
+### Preparação para Deploy
+1. **Configure o banco de dados** em produção
+2. **Execute as migrações** do Prisma
+3. **Gere o cliente** Prisma para produção
+4. **Configure as variáveis** de ambiente
+5. **Build da aplicação** com `npm run build`
+
+### Estrutura de Arquivos em Produção
+- `/public/infos/` - Pasta para upload de fotos (necessita permissão de escrita)
+- Configuração de CORS se necessário
+- Rate limiting para APIs públicas (recomendado)
+
+### Melhorias para Produção
+- [ ] Autenticação JWT robusta
+- [ ] Rate limiting nas APIs
+- [ ] Backup automático do banco
+- [ ] CDN para imagens
+- [ ] Monitoramento de performance
+- [ ] Logs estruturados
+- [ ] HTTPS obrigatório
+
+## 🐛 Solução de Problemas
+
+### Problemas Comuns
+
+**Erro: "Cannot find module 'mysql2'"**
+```bash
+npm install mysql2
+```
+
+**Erro: "DATABASE_URL not found"**
+- Verifique se o arquivo `.env` existe na raiz
+- Confirme a string de conexão MySQL
+
+**Fotos não aparecem no dashboard**
+- Verifique se a pasta `public/infos` tem permissão de escrita
+- Confirme se as URLs estão sendo salvas corretamente
+
+**Erro 404 na página inicial**
+- Certifique-se de estar na pasta `desaparecidos-mt`
+- Execute `npm run dev` a partir da pasta correta
+
+### Logs de Debug
+O sistema inclui logs detalhados no console para:
+- Carregamento de imagens
+- Submissão de formulários
+- Operações do banco de dados
+- Upload de arquivos
 
 ---
 
-Feito com ❤️ para apoiar o trabalho da Polícia Civil do Estado de Mato Grosso. Se notar qualquer problema ou tiver sugestões, abra uma issue ou envie um PR.#
+## 🤝 Contribuindo
+
+Este sistema foi desenvolvido para apoiar o trabalho da **Polícia Civil do Estado de Mato Grosso** na divulgação e busca de pessoas desaparecidas.
+
+### Como Contribuir
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature
+3. Commit suas mudanças
+4. Abra um Pull Request
+
+### Reportando Problemas
+- Abra uma issue detalhando o problema
+- Inclua prints de tela se relevante
+- Descreva os passos para reproduzir
+
+**Desenvolvido com ❤️ para salvar vidas e reunir famílias.**

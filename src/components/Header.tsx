@@ -169,14 +169,14 @@ export function Header() {
               </motion.button>
             ) : (
               <motion.button 
-                className="hidden md:flex items-center gap-2 px-4 py-2 bg-yellow-400 text-black rounded-md hover:bg-yellow-500 transition-colors font-medium text-sm"
+                className="hidden md:flex items-center gap-2 px-4 py-2 bg-yellow-400 text-white rounded-md hover:bg-yellow-500 transition-colors font-medium text-sm"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.15 }}
                 onClick={() => window.location.href = '/admin/login'}
               >
                 <LogIn className="w-4 h-4" />
-                Admin
+                Login
               </motion.button>
             )}
             

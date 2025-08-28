@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Search, Filter, Eye, Calendar, MapPin, User, Phone, Mail, FileText, Image as ImageIcon, ExternalLink, Archive, ArchiveX } from 'lucide-react';
+import { LogOut, Search, Filter, Eye, Calendar, MapPin, User, Phone, Mail, FileText, Image as ImageIcon, ExternalLink, Archive, ArchiveX, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Information {
@@ -36,6 +36,7 @@ export default function AdminDashboard() {
   const [selectedPerson, setSelectedPerson] = useState<string>('all');
   const [showDetails, setShowDetails] = useState<string | null>(null);
   const [showPhotoModal, setShowPhotoModal] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<{ url: string; index: number; total: number } | null>(null);
   const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active');
   const router = useRouter();
 
@@ -504,7 +505,7 @@ export default function AdminDashboard() {
                        initial={{ opacity: 0, scale: 0.9 }}
                        animate={{ opacity: 1, scale: 1 }}
                        transition={{ delay: index * 0.1 }}
-                       onClick={() => window.location.href = photoUrl.trim()}
+                       onClick={() => setSelectedImage({ url: photoUrl.trim(), index, total: photoUrls.length })}
                           >
                             <div className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 hover:border-yellow-400 transition-colors bg-gray-100 shadow-md hover:shadow-lg">
                               <img
@@ -543,7 +544,108 @@ export default function AdminDashboard() {
                </motion.div>
              </motion.div>
            )}
-         </AnimatePresence>
-       </div>
-     );
-   }
+                 </AnimatePresence>
+
+        {/* Modal de Imagem Ampliada */}
+        <AnimatePresence>
+          {selectedImage && (
+            <motion.div
+              className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[60] p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedImage(null)}
+            >
+              <motion.div
+                className="relative max-w-[90vw] max-h-[90vh] w-full h-full flex items-center justify-center"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Botão de Fechar */}
+                <motion.button
+                  className="absolute top-4 right-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setSelectedImage(null)}
+                >
+                  <X className="w-6 h-6" />
+                </motion.button>
+
+                {/* Navegação (se houver múltiplas imagens) */}
+                {selectedImage.total > 1 && (
+                  <>
+                    {/* Botão Anterior */}
+                    {selectedImage.index > 0 && (
+                      <motion.button
+                        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => {
+                          const info = informations.find(i => i.id === showPhotoModal);
+                          if (info && info.photos) {
+                            const photoUrls = info.photos.split(',').filter(url => url.trim());
+                            const newIndex = selectedImage.index - 1;
+                            setSelectedImage({
+                              url: photoUrls[newIndex].trim(),
+                              index: newIndex,
+                              total: photoUrls.length
+                            });
+                          }
+                        }}
+                      >
+                        <ChevronLeft className="w-6 h-6" />
+                      </motion.button>
+                    )}
+
+                    {/* Botão Próximo */}
+                    {selectedImage.index < selectedImage.total - 1 && (
+                      <motion.button
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => {
+                          const info = informations.find(i => i.id === showPhotoModal);
+                          if (info && info.photos) {
+                            const photoUrls = info.photos.split(',').filter(url => url.trim());
+                            const newIndex = selectedImage.index + 1;
+                            setSelectedImage({
+                              url: photoUrls[newIndex].trim(),
+                              index: newIndex,
+                              total: photoUrls.length
+                            });
+                          }
+                        }}
+                      >
+                        <ChevronRight className="w-6 h-6" />
+                      </motion.button>
+                    )}
+                  </>
+                )}
+
+                {/* Imagem Ampliada */}
+                <motion.img
+                  src={selectedImage.url}
+                  alt={`Foto ${selectedImage.index + 1} de ${selectedImage.total}`}
+                  className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/sem-foto.svg';
+                  }}
+                />
+
+                {/* Contador de Fotos */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+                  {selectedImage.index + 1} de {selectedImage.total}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }

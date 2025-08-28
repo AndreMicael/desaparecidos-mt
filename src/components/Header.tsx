@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Phone, Mail, LogIn, LogOut } from 'lucide-react';
+import { Phone, Mail, LogIn, LogOut, LayoutDashboard } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
@@ -154,19 +154,31 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Login/Logout button and mobile menu */}
+          {/* Admin controls and mobile menu */}
           <div className="flex items-center gap-3">
             {isLoggedIn ? (
-              <motion.button 
-                className="hidden md:flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium text-sm"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.15 }}
-                onClick={handleLogout}
-              >
-                <LogOut className="w-4 h-4" />
-                Sair
-              </motion.button>
+              <div className="hidden md:flex items-center gap-3">
+                <motion.button 
+                  className="flex items-center gap-2 px-4 py-2 bg-transparent outline-2 outline-black-400 text-white rounded-md hover:bg-white hover:text-black transition-colors font-medium text-sm"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  onClick={() => window.location.href = '/admin/dashboard'}
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
+                </motion.button>
+                <motion.button 
+                  className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium text-sm"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  onClick={handleLogout}
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sair
+                </motion.button>
+              </div>
             ) : (
               <motion.button 
                 className="hidden md:flex items-center gap-2 px-4 py-2 bg-yellow-400 text-white rounded-md hover:bg-yellow-500 transition-colors font-medium text-sm"

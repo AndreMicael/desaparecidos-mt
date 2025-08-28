@@ -498,13 +498,13 @@ export default function AdminDashboard() {
                        </div>
                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                          {photoUrls.map((photoUrl, index) => (
-                          <motion.div
-                            key={index}
-                            className="relative cursor-pointer group"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: index * 0.1 }}
-                            onClick={() => window.open(photoUrl.trim(), '_blank')}
+                                               <motion.div
+                       key={index}
+                       className="relative cursor-pointer group"
+                       initial={{ opacity: 0, scale: 0.9 }}
+                       animate={{ opacity: 1, scale: 1 }}
+                       transition={{ delay: index * 0.1 }}
+                       onClick={() => window.location.href = photoUrl.trim()}
                           >
                             <div className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 hover:border-yellow-400 transition-colors bg-gray-100 shadow-md hover:shadow-lg">
                               <img

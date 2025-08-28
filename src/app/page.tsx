@@ -152,6 +152,70 @@ export default function HomePage() {
         transition={{ duration: 0.6, delay: 0.6 }}
       >
         <div className="max-w-7xl mx-auto px-4">
+          {/* Barra de Busca Rápida - Aparece em todas as páginas */}
+          <motion.div 
+            className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <div className="max-w-2xl mx-auto">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+                Busca Rápida
+              </h3>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  placeholder="Digite o nome da pessoa..."
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-black"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      const target = e.target as HTMLInputElement;
+                      if (target.value.trim()) {
+                        handleSearch({ 
+                          nome: target.value.trim(),
+                          idadeMinima: '',
+                          idadeMaxima: '',
+                          sexos: [],
+                          status: []
+                        });
+                        target.value = '';
+                      }
+                    }
+                  }}
+                />
+                <motion.button
+                  onClick={() => {
+                    const input = document.querySelector('input[placeholder="Digite o nome da pessoa..."]') as HTMLInputElement;
+                    if (input && input.value.trim()) {
+                      handleSearch({ 
+                        nome: input.value.trim(),
+                        idadeMinima: '',
+                        idadeMaxima: '',
+                        sexos: [],
+                        status: []
+                      });
+                      input.value = '';
+                    }
+                  }}
+                  className="px-6 py-2 bg-yellow-400 text-white rounded-md hover:bg-yellow-500 transition-colors font-medium"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Buscar
+                </motion.button>
+                <motion.button
+                  onClick={handleClear}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Limpar
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+
           <motion.div 
             className="mb-8"
             initial={{ y: 20, opacity: 0 }}

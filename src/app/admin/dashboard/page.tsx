@@ -443,23 +443,28 @@ export default function AdminDashboard() {
                exit={{ scale: 0.9, opacity: 0 }}
                onClick={(e) => e.stopPropagation()}
              >
-               <div className="p-6 border-b border-gray-200">
-                 <div className="flex items-center justify-between">
-                   <h3 className="text-lg font-semibold text-gray-900">
-                     Anexos Enviados
-                   </h3>
-                   <motion.button
-                     onClick={() => setShowPhotoModal(null)}
-                     className="text-gray-400 hover:text-gray-600 transition-colors"
-                     whileHover={{ scale: 1.1 }}
-                     whileTap={{ scale: 0.9 }}
-                   >
-                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                     </svg>
-                   </motion.button>
-                 </div>
-               </div>
+                               <div className="p-6 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Fotos Anexadas
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Clique em qualquer foto para visualizar em tamanho completo
+                      </p>
+                    </div>
+                    <motion.button
+                      onClick={() => setShowPhotoModal(null)}
+                      className="text-gray-400 hover:text-gray-600 transition-colors"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </motion.button>
+                  </div>
+                </div>
                
                <div className="p-6">
                  {(() => {
@@ -495,21 +500,17 @@ export default function AdminDashboard() {
                          {photoUrls.map((photoUrl, index) => (
                           <motion.div
                             key={index}
-                            className="relative group cursor-pointer"
+                            className="relative cursor-pointer group"
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: index * 0.1 }}
                             onClick={() => window.open(photoUrl.trim(), '_blank')}
                           >
-                            <div className="text-xs text-gray-500 mb-1 truncate" title={photoUrl.trim()}>
-                              URL: {photoUrl.trim()}
-                            </div>
-                            <div className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 hover:border-yellow-400 transition-colors bg-gray-100">
+                            <div className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 hover:border-yellow-400 transition-colors bg-gray-100 shadow-md hover:shadow-lg">
                               <img
                                 src={photoUrl.trim()}
-                                alt={`Anexo ${index + 1} - ${photoUrl}`}
-                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                                style={{ minHeight: '200px' }}
+                                alt={`Anexo ${index + 1}`}
+                                className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
                                   console.error('Erro ao carregar imagem:', photoUrl.trim());
@@ -519,19 +520,18 @@ export default function AdminDashboard() {
                                 onLoad={(e) => {
                                   const target = e.target as HTMLImageElement;
                                   console.log('Imagem carregada com sucesso:', photoUrl.trim());
-                                  console.log('Dimensões da imagem:', target.naturalWidth, 'x', target.naturalHeight);
                                 }}
                               />
                             </div>
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center rounded-lg">
-                              <motion.div
-                                className="opacity-0 group-hover:opacity-100 bg-white text-gray-900 px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 shadow-lg"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                              >
-                                <ExternalLink className="w-4 h-4 inline mr-1" />
-                                Clique para ampliar
-                              </motion.div>
+                            {/* Indicador sutil de que é clicável */}
+                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="bg-black bg-opacity-50 text-white p-1 rounded-full">
+                                <ExternalLink className="w-4 h-4" />
+                              </div>
+                            </div>
+                            {/* Label da foto */}
+                            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              Foto {index + 1} - Clique para ampliar
                             </div>
                           </motion.div>
                         ))}

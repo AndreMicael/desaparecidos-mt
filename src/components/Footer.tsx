@@ -1,5 +1,9 @@
 "use client";
 
+import { ImageWithFallback } from "./ui/image-with-fallback";
+import LogoPJC from "../../public/logo_pjc.svg";
+import Image from "next/image";
+
 export function Footer() {
   return (
     <footer className="bg-black text-white border-t border-gray-800 font-encode-sans">
@@ -32,16 +36,16 @@ export function Footer() {
           <div className="flex flex-wrap items-center justify-center gap-8">
             {/* Logos dos parceiros */}
             <div className="flex items-center justify-center w-24 h-12 bg-yellow-400 rounded p-2">
-              <span className="text-xs text-black text-center font-medium">Governo MT</span>
+              <span className="text-xs text-white text-center font-medium">Governo MT</span>
             </div>
             <div className="flex items-center justify-center w-24 h-12 bg-yellow-400 rounded p-2">
-              <span className="text-xs text-black text-center font-medium">SESP</span>
+              <span className="text-xs text-white text-center font-medium">SESP</span>
             </div>
             <div className="flex items-center justify-center w-24 h-12 bg-yellow-400 rounded p-2">
-              <span className="text-xs text-black text-center font-medium">GEIA</span>
+              <span className="text-xs text-white text-center font-medium">GEIA</span>
             </div>
             <div className="flex items-center justify-center w-24 h-12 bg-yellow-400 rounded p-2">
-              <span className="text-xs text-black text-center font-medium">UFMT</span>
+              <span className="text-xs text-white text-center font-medium">UFMT</span>
             </div>
           </div>
         </div>
@@ -53,10 +57,8 @@ export function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Logo e informações */}
             <div className="lg:col-span-2">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-yellow-400 rounded-lg flex items-center justify-center mr-4">
-                  <span className="text-2xl font-bold text-black">D</span>
-                </div>
+              <div className="flex items-center gap-4 mb-4">
+              <Image src={LogoPJC} alt="Logo" width={50} height={50} />
                 <div>
                   <h3 className="text-xl font-bold text-yellow-400">DESAPARECIDOS</h3>
                   <p className="text-sm text-gray-400">Polícia Civil - MT</p>
@@ -90,17 +92,17 @@ export function Footer() {
             <div>
               <h4 className="font-semibold text-lg mb-4 text-yellow-400">Emergência</h4>
               <div className="space-y-3">
-                <div className="p-3 bg-red-600 rounded-lg text-center">
+                <div className="p-3 bg-transparent rounded-lg text-center outline outline-white">
                   <p className="font-bold text-lg text-white">190</p>
-                  <p className="text-xs text-gray-200">Polícia Militar</p>
+                  <p className="text-xs text-white">Polícia Militar</p>
                 </div>
-                <div className="p-3 bg-orange-600 rounded-lg text-center">
+                <div className="p-3 bg-transparent rounded-lg text-center outline outline-white">
                   <p className="font-bold text-lg text-white">193</p>
-                  <p className="text-xs text-gray-200">Bombeiros</p>
+                  <p className="text-xs text-white">Bombeiros</p>
                 </div>
-                <div className="p-3 bg-yellow-400 rounded-lg text-center">
-                  <p className="font-bold text-lg text-black">197</p>
-                  <p className="text-xs text-black">Polícia Civil</p>
+                <div className="p-3 bg-transparent rounded-lg text-center outline outline-white">
+                  <p className="font-bold text-lg text-white">197</p>
+                  <p className="text-xs text-white">Polícia Civil</p>
                 </div>
               </div>
             </div>
@@ -112,7 +114,7 @@ export function Footer() {
       <div className="bg-gray-900 py-4 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between text-sm text-gray-400">
-            <p>© 2025 Polícia Civil do Estado de Mato Grosso. Todos os direitos reservados.</p>
+            <p>© 2025 Site criado para fins de estudo e desenvolvimento de habilidades. Não relacionado a Polícia Civil do Estado de Mato Grosso.</p>
             <div className="flex space-x-4 mt-2 md:mt-0">
               <a href="#" className="hover:text-yellow-400 transition-colors">Política de Privacidade</a>
               <a href="#" className="hover:text-yellow-400 transition-colors">Termos de Uso</a>

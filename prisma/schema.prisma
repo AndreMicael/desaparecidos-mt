@@ -1,0 +1,28 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Information {
+  id                String   @id @default(cuid())
+  personId          String
+  informantName     String
+  informantPhone    String?
+  informantEmail    String?
+  sightingDate      DateTime?
+  sightingLocation  String
+  description       String
+  photos            String?  // URLs das fotos separadas por vírgula
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("informations")
+}

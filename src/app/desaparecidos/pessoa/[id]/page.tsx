@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { InstagramLogoIcon, WhatsappLogo } from '@phosphor-icons/react';
 import { PosterGenerator } from '@/components/PosterGenerator';
+import { InformationForm } from '@/components/InformationForm';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Lazy loading dos componentes
@@ -27,6 +28,7 @@ export default function DesaparecidoPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPosterGenerator, setShowPosterGenerator] = useState(false);
+  const [showInformationForm, setShowInformationForm] = useState(false);
 
   const personId = params.id as string;
 
@@ -329,13 +331,14 @@ export default function DesaparecidoPage() {
                     </motion.div>
                   )}
 
-                  {/* Botão de Ação Principal */}
+                  {/* Botões de Ação */}
                   <motion.div 
-                    className="pt-4 border-t border-gray-100"
+                    className="pt-4 border-t border-gray-100 space-y-3"
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.5, delay: 1.2 }}
                   >
+                    {/* Botão Principal - Ligar */}
                     <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                       <Button 
                         className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-sm text-sm sm:text-base transition-colors duration-200"
@@ -349,7 +352,22 @@ export default function DesaparecidoPage() {
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                           </svg>
-                          TEM INFORMAÇÕES? LIGUE 197
+                           LIGUE 197
+                        </div>
+                      </Button>
+                    </motion.div>
+
+                    {/* Botão Registrar Informações */}
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <Button 
+                        className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-3 px-6 rounded-sm text-sm sm:text-base transition-colors duration-200 border-2 border-yellow-400"
+                        onClick={() => setShowInformationForm(true)}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          TEM INFORMAÇÕES? CLIQUE AQUI
                         </div>
                       </Button>
                     </motion.div>
@@ -473,6 +491,18 @@ export default function DesaparecidoPage() {
             person={person}
             isOpen={showPosterGenerator}
             onClose={() => setShowPosterGenerator(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Formulário de Informações */}
+      <AnimatePresence>
+        {person && showInformationForm && (
+          <InformationForm
+            isOpen={showInformationForm}
+            onClose={() => setShowInformationForm(false)}
+            personId={person.id.toString()}
+            personName={person.nome}
           />
         )}
       </AnimatePresence>

@@ -3,6 +3,90 @@
 import { ImageWithFallback } from "./ui/image-with-fallback";
 import LogoPJC from "../../public/logo_pjc.svg";
 import Image from "next/image";
+import { useState, useEffect } from "react";
+
+// Componente para indicar o status da API
+function ApiStatusIndicator() {
+  const [status, setStatus] = useState<'online' | 'offline' | 'checking'>('checking');
+  const [lastCheck, setLastCheck] = useState<Date | null>(null);
+
+  const checkApiStatus = async () => {
+    try {
+      setStatus('checking');
+      const response = await fetch('/api/pessoas', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        setStatus('online');
+      } else {
+        setStatus('offline');
+      }
+      setLastCheck(new Date());
+    } catch (error) {
+      setStatus('offline');
+      setLastCheck(new Date());
+    }
+  };
+
+  useEffect(() => {
+    // Verificar imediatamente
+    checkApiStatus();
+    
+    // Verificar a cada minuto (60000ms)
+    const interval = setInterval(checkApiStatus, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const getStatusColor = () => {
+    switch (status) {
+      case 'online':
+        return 'bg-green-500';
+      case 'offline':
+        return 'bg-red-500';
+      case 'checking':
+        return 'bg-yellow-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  const getStatusText = () => {
+    switch (status) {
+      case 'online':
+        return 'API Online';
+      case 'offline':
+        return 'API Offline';
+      case 'checking':
+        return 'Verificando...';
+      default:
+        return 'Desconhecido';
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className={`w-3 h-3 rounded-full ${getStatusColor()} animate-pulse`}></div>
+      <span className="text-xs text-gray-300">{getStatusText()}</span>
+      {lastCheck && (
+        <span className="text-xs text-gray-400">
+          ({lastCheck.toLocaleTimeString('pt-BR')})
+        </span>
+      )}
+      <button
+        onClick={checkApiStatus}
+        className="ml-2 px-2 py-1 text-xs bg-yellow-400 text-black rounded hover:bg-yellow-300 transition-colors font-medium"
+        title="Verificar status da API agora"
+      >
+        Verificar
+      </button>
+    </div>
+  );
+}
 
 export function Footer() {
   return (
@@ -73,6 +157,12 @@ export function Footer() {
                 <p>Cuiabá - MT, CEP: 78050-970</p>
                 <p><strong className="text-yellow-400">Telefone:</strong> (65) 3648-5100</p>
                 <p><strong className="text-yellow-400">Email:</strong> atendimento@policiacivil.mt.gov.br</p>
+              </div>
+              
+              {/* Indicador de status da API */}
+              <div className="mt-4 p-3 bg-gray-800 rounded-lg">
+                <h5 className="text-sm font-medium text-yellow-400 mb-2">Status do Sistema</h5>
+                <ApiStatusIndicator />
               </div>
             </div>
 

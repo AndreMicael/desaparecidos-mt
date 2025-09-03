@@ -8,7 +8,7 @@
 
 
 </div>
-
+ 
 ---
 
 Sistema completo para divulgação e gerenciamento de informações sobre pessoas desaparecidas, desenvolvido com Next.js 15, TypeScript e MySQL. O projeto inclui área pública para busca e submissão de informações, área administrativa para gerenciamento, e integração com API externa do Abitus para sincronização de dados.
@@ -55,8 +55,6 @@ Sistema completo para divulgação e gerenciamento de informações sobre pessoa
 - **Sonner** - Notificações toast
 
 ### Backend
-- **MySQL** - Banco de dados principal
-- **Prisma** - ORM para gerenciamento do banco
 - **Next.js API Routes** - Endpoints da aplicação
 
 ### Integração Externa
@@ -70,15 +68,7 @@ Sistema completo para divulgação e gerenciamento de informações sobre pessoa
 ## 📋 Pré-requisitos
 - **Node.js 18+** (recomendado LTS)
 - **npm 9+** (ou yarn/pnpm/bun)
-- **MySQL 8.0+** - Banco de dados
 
-## 🗃️ Configuração do Banco
-
-### Variáveis de Ambiente
-Crie um arquivo `.env` na raiz do projeto:
-```env
-DATABASE_URL="mysql://usuario:senha@host:porta/database"
-```
 
 ### Estrutura do Banco
 O sistema criará automaticamente as seguintes tabelas:

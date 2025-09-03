@@ -1,6 +1,17 @@
 # Sistema de Pessoas Desaparecidas – Polícia Civil MT
 
-Sistema completo para divulgação e gerenciamento de informações sobre pessoas desaparecidas, desenvolvido com Next.js, TypeScript e MySQL. O projeto inclui área pública para busca e submissão de informações, e área administrativa para gerenciamento.
+<div align="center">
+
+![React](https://img.shields.io/badge/React-19.1-blue?style=for-the-badge&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
+![Next.js](https://img.shields.io/badge/Next.js-15.4-black?style=for-the-badge&logo=next.js)
+
+
+</div>
+
+---
+
+Sistema completo para divulgação e gerenciamento de informações sobre pessoas desaparecidas, desenvolvido com Next.js 15, TypeScript e MySQL. O projeto inclui área pública para busca e submissão de informações, área administrativa para gerenciamento, e integração com API externa do Abitus para sincronização de dados.
 
 ## 🚀 Funcionalidades Principais
 

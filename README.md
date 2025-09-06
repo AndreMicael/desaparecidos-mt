@@ -133,8 +133,7 @@ npm run dev
 ### Scripts Docker
 - `docker build -t desaparecidos-mt:latest .` - Build da imagem Docker
 - `docker run -d -p 3000:3000 --name desaparecidos-mt-container desaparecidos-mt:latest` - Executar container
-- `./docker-run.sh` - Script automatizado (Linux/macOS)
-- `.\docker-run.ps1` - Script automatizado (Windows)
+
 
 ## 📁 Estrutura do projeto
 

@@ -31,8 +31,6 @@ interface Information {
   sightingLocation: string;
   description: string;
   photos: string | null;
-  archived: boolean;
-  archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
   ocoId?: number;
@@ -105,8 +103,6 @@ export default function DesaparecidoPage() {
           sightingLocation: 'Local não especificado',
           description: info.informacao || info.descricao || 'Sem descrição disponível',
           photos: info.files ? info.files.join(',') : null,
-          archived: false,
-          archivedAt: null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           // Campos originais da API externa
@@ -767,12 +763,8 @@ export default function DesaparecidoPage() {
                             )}
 
                             <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
-                              <span className={`text-xs px-2 py-1 rounded-full ${
-                                info.archived 
-                                  ? 'bg-gray-100 text-gray-600' 
-                                  : 'bg-green-100 text-green-600'
-                              }`}>
-                                {info.archived ? 'Arquivada' : 'Ativa'}
+                              <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-600">
+                                Ativa
                               </span>
                               <span className="text-xs text-gray-500">
                                 ID: {info.id}

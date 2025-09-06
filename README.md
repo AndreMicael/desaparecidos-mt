@@ -27,7 +27,6 @@ Sistema completo para divulgação e gerenciamento de informações sobre pessoa
 - **Dashboard completo** para administradores
 - **Sistema de login** simples (admin/admin)
 - **Gerenciamento de informações** submetidas pelos cidadãos
-- **Sistema de arquivamento** de informações processadas
 - **Visualização de anexos** enviados pelos usuários
 - **Estatísticas em tempo real**
 
@@ -201,14 +200,12 @@ public/
 #### Dashboard de Gerenciamento
 - **Visualização completa** de todas as informações
 - **Estatísticas em tempo real** (total, pessoas únicas, hoje)
-- **Sistema de abas** (Ativas/Arquivadas)
 - **Busca e filtros** por pessoa ou conteúdo
 - **Visualização de anexos** em modal interativo
 
 #### Gerenciamento de Informações
 - **Cards organizados** com foto da pessoa desaparecida
 - **Dados completos** do informante e avistamento
-- **Botões de ação** para arquivar/desarquivar
 - **Contador automático** por categoria
 - **Preservação de filtros** entre abas
 
@@ -223,7 +220,7 @@ public/
 
 ### Administrativas
 - `GET /api/admin/informations` - Lista todas as informações submetidas
-- `PATCH /api/admin/informations/[id]/archive` - Arquiva/desarquiva informação
+
 
 ### Parâmetros de Busca
 ```typescript
@@ -309,11 +306,6 @@ const customJestConfig = {
 - ✅ Tratamento de erro interno do servidor
 - ✅ Validação de IDs
 
-**PATCH /api/admin/informations/[id]/archive**
-- ✅ Arquivamento com sucesso
-- ✅ Tratamento de erro ao arquivar
-- ✅ Validação de dados de entrada
-- ✅ Tratamento de erro de rede
 
 ### 🔧 Funcionalidades dos Testes
 
@@ -494,14 +486,14 @@ it('deve processar fluxo completo de busca e envio de informações', async () =
 - **Validações**: 100% dos casos de validação
 
 #### Cenários Testados
-- ✅ **28 testes** executando com sucesso
+- ✅ **24 testes** executando com sucesso
 - ✅ **0 falhas** nos testes
 - ✅ **100% de cobertura** das APIs
 - ✅ **Tempo de execução** < 3 segundos
 
 #### Tipos de Cenário
-- **Cenários de sucesso**: 15 testes
-- **Cenários de erro**: 8 testes
+- **Cenários de sucesso**: 13 testes
+- **Cenários de erro**: 6 testes
 - **Cenários de validação**: 3 testes
 - **Cenários de integração**: 2 testes
 
@@ -546,9 +538,8 @@ it('deve processar fluxo completo de busca e envio de informações', async () =
    - Número de pessoas únicas com informações
    - Informações recebidas hoje
 
-2. **Gerenciamento por Abas**
-   - **Ativas**: Informações não processadas
-   - **Arquivadas**: Informações já processadas
+2. **Gerenciamento de Informações**
+   - **Visualização completa** de todas as informações submetidas
 
 3. **Visualização Detalhada**
    - Foto da pessoa desaparecida
@@ -556,11 +547,6 @@ it('deve processar fluxo completo de busca e envio de informações', async () =
    - Detalhes do avistamento
    - Galeria de fotos anexadas
 
-4. **Ações Disponíveis**
-   - Arquivar informação processada
-   - Desarquivar se necessário
-   - Visualizar anexos em modal
-   - Buscar e filtrar informações
 
 ## 🚀 Deploy e produção
 

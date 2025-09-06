@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import { GET as getAdminInformations } from '../admin/informations/route';
 import { GET as getAdminInformationsPessoa } from '../admin/informations/pessoa/[id]/route';
-import { PATCH as patchArchiveInformation } from '../admin/informations/[id]/archive/route';
 
 // Mock do fetch global
 global.fetch = jest.fn();
@@ -208,82 +207,6 @@ describe('APIs Administrativas', () => {
     });
   });
 
-  describe('PATCH /api/admin/informations/[id]/archive', () => {
-    it('deve arquivar uma informação com sucesso', async () => {
-      const mockRequest = {
-        json: () => Promise.resolve({ archived: true })
-      } as NextRequest;
-
-      const mockResponse = {
-        id: 123,
-        archived: true
-      };
-
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      });
-
-      const response = await patchArchiveInformation(mockRequest, {
-        params: Promise.resolve({ id: '123' })
-      });
-      const data = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.message).toBe('Informação arquivada');
-    });
-
-    it('deve tratar erro ao arquivar informação', async () => {
-      const mockRequest = {
-        json: () => Promise.resolve({ archived: true })
-      } as NextRequest;
-
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        text: () => Promise.resolve('Not Found')
-      });
-
-      const response = await patchArchiveInformation(mockRequest, {
-        params: Promise.resolve({ id: '999' })
-      });
-      const data = await response.json();
-
-      expect(response.status).toBe(404);
-      expect(data.error).toBe('Erro ao arquivar informação na API externa');
-    });
-
-    it('deve validar dados de entrada', async () => {
-      const mockRequest = {
-        json: () => Promise.resolve({}) // Dados inválidos
-      } as NextRequest;
-
-      const response = await patchArchiveInformation(mockRequest, {
-        params: Promise.resolve({ id: '123' })
-      });
-      const data = await response.json();
-
-      expect(response.status).toBe(400);
-      expect(data.error).toBe('Campo archived deve ser um boolean');
-    });
-
-    it('deve tratar erro de rede', async () => {
-      const mockRequest = {
-        json: () => Promise.resolve({ archived: true })
-      } as NextRequest;
-
-      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
-
-      const response = await patchArchiveInformation(mockRequest, {
-        params: Promise.resolve({ id: '123' })
-      });
-      const data = await response.json();
-
-      expect(response.status).toBe(500);
-      expect(data.error).toBe('Erro interno do servidor');
-    });
-  });
 
   describe('Testes de Segurança', () => {
     it('deve validar IDs numéricos', async () => {

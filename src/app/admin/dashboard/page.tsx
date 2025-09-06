@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Search, Filter, Eye, Calendar, MapPin, User, Phone, Mail, FileText, Image as ImageIcon, ExternalLink, Archive, ArchiveX, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LogOut, Search, Filter, Eye, Calendar, MapPin, User, Phone, Mail, FileText, Image as ImageIcon, ExternalLink, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Information {
@@ -16,8 +16,6 @@ interface Information {
   sightingLocation: string;
   description: string;
   photos: string | null;
-  archived: boolean;
-  archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
   // Campos da API externa
@@ -43,7 +41,6 @@ export default function AdminDashboard() {
   const [showDetails, setShowDetails] = useState<string | null>(null);
   const [showPhotoModal, setShowPhotoModal] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<{ url: string; index: number; total: number } | null>(null);
-  const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active');
   const router = useRouter();
 
   useEffect(() => {
@@ -109,8 +106,6 @@ export default function AdminDashboard() {
           sightingLocation: 'Local não especificado',
           description: info.informacao || info.descricao || 'Sem descrição disponível',
           photos: info.files ? info.files.join(',') : null,
-          archived: false,
-          archivedAt: null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           // Campos originais da API externa
@@ -142,35 +137,8 @@ export default function AdminDashboard() {
     router.push('/admin/login');
   };
 
-  const handleArchive = async (informationId: string, archive: boolean) => {
-    try {
-      const response = await fetch(`/api/admin/informations/${informationId}/archive`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ archived: archive }),
-      });
 
-      if (!response.ok) {
-        throw new Error('Erro ao arquivar informação');
-      }
-
-      toast.success(archive ? 'Informação arquivada' : 'Informação desarquivada');
-      // Recarregar informações da pessoa selecionada
-      if (selectedPerson && selectedPerson !== 'all') {
-        loadInformationsForPerson(selectedPerson);
-      }
-    } catch (error) {
-      console.error('Erro ao arquivar informação:', error);
-      toast.error('Erro ao arquivar informação');
-    }
-  };
-
-  const filteredInformations = informations.filter(info => {
-    const matchesTab = activeTab === 'active' ? !info.archived : info.archived;
-    return matchesTab;
-  });
+  const filteredInformations = informations;
 
   const getPersonName = (personId: string) => {
     const person = persons.find(p => p.id.toString() === personId);
@@ -317,29 +285,6 @@ export default function AdminDashboard() {
                   Informações de {getPersonName(selectedPerson)}
                 </h2>
                 
-                {/* Abas */}
-                <div className="flex bg-gray-100 rounded-lg p-1">
-                  <button
-                    onClick={() => setActiveTab('active')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                      activeTab === 'active'
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    Ativas ({informations.filter(info => !info.archived).length})
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('archived')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                      activeTab === 'archived'
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    Arquivadas ({informations.filter(info => info.archived).length})
-                  </button>
-                </div>
               </div>
             </div>
           
@@ -444,31 +389,6 @@ export default function AdminDashboard() {
                         </p>
                       </div>
 
-                      {/* Botões de Ação */}
-                      <div className="flex gap-2 pt-4 border-t border-gray-100">
-                        <motion.button
-                          onClick={() => handleArchive(info.id, !info.archived)}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                            info.archived
-                              ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                              : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
-                          }`}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          {info.archived ? (
-                            <>
-                              <ArchiveX className="w-4 h-4" />
-                              Desarquivar
-                            </>
-                          ) : (
-                            <>
-                              <Archive className="w-4 h-4" />
-                              Arquivar
-                            </>
-                          )}
-                        </motion.button>
-                      </div>
                     </div>
                   </div>
                 </motion.div>

@@ -414,7 +414,7 @@ export function HomePage({ onPersonClick }: HomePageProps) {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.4, delay: 0.5 + index * 0.1 + itemIndex * 0.1 }}
                         >
-                          {item.label && <strong className="text-white">{item.label}</strong>} {item.value}
+                          {'label' in item && item.label && <strong className="text-white">{item.label}</strong>} {item.value}
                         </motion.p>
                       ))}
                     </div>

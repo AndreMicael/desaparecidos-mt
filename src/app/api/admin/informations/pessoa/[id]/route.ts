@@ -4,10 +4,10 @@ const EXTERNAL_API_URL = 'https://abitus-api.geia.vip/v1';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const personId = params.id;
+    const { id: personId } = await params;
     console.log('Buscando informações para pessoa ID:', personId);
 
     // Primeiro, buscar a pessoa para obter o ocoId

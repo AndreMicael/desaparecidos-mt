@@ -5,11 +5,11 @@ const EXTERNAL_API_URL = 'https://abitus-api.geia.vip/v1';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { archived } = await request.json();
-    const informationId = params.id;
+    const { id: informationId } = await params;
 
     if (typeof archived !== 'boolean') {
       return NextResponse.json(

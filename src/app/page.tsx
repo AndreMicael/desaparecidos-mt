@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Person } from '@/types/person';
 import { toast } from 'sonner';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -24,7 +24,7 @@ const Toaster = dynamic(() => import('@/components/ui/sonner').then(mod => ({ de
   ssr: false
 });
 
-export default function HomePage() {
+function HomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [persons, setPersons] = useState<Person[]>([]);
@@ -342,5 +342,20 @@ export default function HomePage() {
       </motion.div>
       <Toaster position="top-right" />
     </motion.div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-yellow-400" />
+          <p className="text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    }>
+      <HomePageContent />
+    </Suspense>
   );
 }

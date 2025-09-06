@@ -112,48 +112,45 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
     setIsSubmitting(true);
 
     try {
-      // Upload real das fotos
-      let photoUrls: string[] = [];
-      
-      if (photos.length > 0) {
-        const formData = new FormData();
-        photos.forEach(photo => {
-          formData.append('photos', photo);
-        });
-
-        const uploadResponse = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error('Erro no upload das fotos');
-        }
-
-        const uploadResult = await uploadResponse.json();
-        photoUrls = uploadResult.files || [];
-      }
-
-      const response = await fetch('/api/informations', {
+      // Enviar dados diretamente para a API externa (apenas o necessário conforme Swagger)
+      const response = await fetch('/api/informations/external', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          personId,
-          ...formData,
-          informantName: formData.isAnonymous ? 'Anônimo' : formData.informantName,
-          informantPhone: formData.isAnonymous && !formData.includePhone ? '' : formData.informantPhone,
-          informantEmail: formData.isAnonymous && !formData.includeEmail ? '' : formData.informantEmail,
-          photos: photoUrls.join(','),
-        }),
+        body: (() => {
+          const requestFormData = new FormData();
+          
+          // Dados obrigatórios conforme Swagger da API externa
+          requestFormData.append('personId', personId); // Para identificar a pessoa
+          requestFormData.append('sightingDate', formData.sightingDate); // Data do avistamento
+          requestFormData.append('sightingLocation', formData.sightingLocation); // Local do avistamento
+          requestFormData.append('description', formData.description); // Descrição detalhada (informacao)
+          
+          // Informações do informante (para descricao do anexo)
+          const informantInfo = formData.isAnonymous ? 'Anônimo' : formData.informantName;
+          requestFormData.append('informantName', informantInfo);
+          
+          // Adicionar arquivos reais (opcional conforme Swagger)
+          photos.forEach(photo => {
+            requestFormData.append('photos', photo);
+          });
+          
+          return requestFormData;
+        })(),
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao enviar informações');
+        const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
+        console.error('Erro da API:', errorData);
+        throw new Error(errorData.error || `Erro ao enviar informações (${response.status})`);
       }
 
-      toast.success('Informações registradas com sucesso!');
+      const result = await response.json();
+      
+      // Verificar se há aviso sobre fallback
+      if (result.warning) {
+        toast.warning(result.warning);
+      } else {
+        toast.success('Informações registradas com sucesso!');
+      }
       onClose();
       
              // Reset form

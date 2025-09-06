@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Person } from '@/types/person';
 import { toast } from 'sonner';
-import { Loader2, ArrowLeft, Phone, Mail, MapPin, Calendar, FileImage } from 'lucide-react';
+import { Loader2, ArrowLeft, Phone, Mail, MapPin, Calendar, FileImage, Eye, EyeOff, User, Clock, MessageSquare } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
@@ -21,6 +21,27 @@ const Toaster = dynamic(() => import('@/components/ui/sonner').then(mod => ({ de
   ssr: false
 });
 
+interface Information {
+  id: string;
+  personId: string;
+  informantName: string;
+  informantPhone: string | null;
+  informantEmail: string | null;
+  sightingDate: string | null;
+  sightingLocation: string;
+  description: string;
+  photos: string | null;
+  archived: boolean;
+  archivedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  ocoId?: number;
+  informacao?: string;
+  descricao?: string;
+  data?: string;
+  files?: string[];
+}
+
 export default function DesaparecidoPage() {
   const params = useParams();
   const router = useRouter();
@@ -29,12 +50,88 @@ export default function DesaparecidoPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPosterGenerator, setShowPosterGenerator] = useState(false);
   const [showInformationForm, setShowInformationForm] = useState(false);
+  const [informations, setInformations] = useState<Information[]>([]);
+  const [loadingInformations, setLoadingInformations] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showInformations, setShowInformations] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   const personId = params.id as string;
 
   useEffect(() => {
     loadPerson();
+    checkAdminStatus();
   }, [personId]);
+
+  const checkAdminStatus = () => {
+    const token = localStorage.getItem('adminToken');
+    setIsAdmin(!!token);
+  };
+
+  // Funções de paginação
+  const totalPages = Math.ceil(informations.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentInformations = informations.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const resetPagination = () => {
+    setCurrentPage(1);
+  };
+
+  const loadInformations = async () => {
+    if (!isAdmin) return;
+    
+    try {
+      setLoadingInformations(true);
+      
+      // Buscar informações específicas desta pessoa
+      const response = await fetch(`/api/admin/informations/pessoa/${personId}`);
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        // Mapear dados da API externa para o formato esperado
+        const mappedInformations = data.data.map((info: any, index: number) => ({
+          id: info.id || `ext_${info.ocoId}_${index}`,
+          personId: info.personId || personId,
+          informantName: info.descricao || 'Informante Anônimo',
+          informantPhone: null,
+          informantEmail: null,
+          sightingDate: info.data || null,
+          sightingLocation: 'Local não especificado',
+          description: info.informacao || info.descricao || 'Sem descrição disponível',
+          photos: info.files ? info.files.join(',') : null,
+          archived: false,
+          archivedAt: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          // Campos originais da API externa
+          ocoId: info.ocoId,
+          informacao: info.informacao,
+          descricao: info.descricao,
+          data: info.data,
+          files: info.files
+        }));
+        
+        setInformations(mappedInformations);
+        resetPagination(); // Resetar para a primeira página
+        console.log('Informações carregadas para pessoa:', personId, mappedInformations.length);
+      } else {
+        console.log('Nenhuma informação encontrada para pessoa:', personId);
+        setInformations([]);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar informações:', error);
+      toast.error('Erro ao carregar informações');
+      setInformations([]);
+    } finally {
+      setLoadingInformations(false);
+    }
+  };
 
   const loadPerson = async () => {
     try {
@@ -338,24 +435,7 @@ export default function DesaparecidoPage() {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.5, delay: 1.2 }}
                   >
-                    {/* Botão Principal - Ligar */}
-                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                      <Button 
-                        className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-sm text-sm sm:text-base transition-colors duration-200"
-                        onClick={() => {
-                          const phoneNumber = '197';
-                          const message = `Tenho informações sobre ${person.nome}, pessoa desaparecida desde ${person.dtDesaparecimento ? new Date(person.dtDesaparecimento).toLocaleDateString('pt-BR') : 'data não informada'}.`;
-                          window.open(`tel:${phoneNumber}`, '_self');
-                        }}
-                      >
-                        <div className="flex items-center justify-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                          </svg>
-                           LIGUE 197
-                        </div>
-                      </Button>
-                    </motion.div>
+                  
 
                     {/* Botão Registrar Informações */}
                     <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
@@ -372,7 +452,24 @@ export default function DesaparecidoPage() {
                       </Button>
                     </motion.div>
                   </motion.div>
-
+  {/* Botão Principal - Ligar */}
+  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <Button 
+                        className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-sm text-sm sm:text-base transition-colors duration-200"
+                        onClick={() => {
+                          const phoneNumber = '197';
+                          const message = `Tenho informações sobre ${person.nome}, pessoa desaparecida desde ${person.dtDesaparecimento ? new Date(person.dtDesaparecimento).toLocaleDateString('pt-BR') : 'data não informada'}.`;
+                          window.open(`tel:${phoneNumber}`, '_self');
+                        }}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                           LIGUE 197
+                        </div>
+                      </Button>
+                    </motion.div>
                   {/* Ajude compartilhando */}
                   <motion.div 
                     className="pt-4 border-t border-gray-100"
@@ -480,6 +577,302 @@ export default function DesaparecidoPage() {
               </div>
             </div>
           </motion.div>
+
+          {/* Seção de Informações */}
+          {!isAdmin && (
+            <motion.div 
+              className="mt-6 sm:mt-8 bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-6"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.5 }}
+            >
+              <div className="text-center">
+                <div className="mb-4">
+                  <MessageSquare className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Informações Recebidas
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Existem informações sobre esta pessoa, mas elas são visíveis apenas para administradores.
+                  </p>
+                </div>
+                
+                <motion.button
+                  onClick={() => router.push('/admin/login')}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white font-medium rounded-md transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  Fazer Login como Admin
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Seção de Informações (Apenas para Admin) */}
+          {isAdmin && (
+            <motion.div 
+              className="mt-6 sm:mt-8 bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-6"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.5 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5" />
+                  Informações Recebidas
+                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                    Admin
+                  </span>
+                </h3>
+                <motion.button
+                  onClick={() => {
+                    if (!showInformations) {
+                      loadInformations();
+                    }
+                    setShowInformations(!showInformations);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 text-sm bg-black hover:bg-gray-500 rounded-md transition-colors"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {showInformations ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showInformations ? 'Ocultar' : 'Ver'} Informações
+                </motion.button>
+              </div>
+
+              <AnimatePresence>
+                {showInformations && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    {loadingInformations ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+                        <span className="ml-2 text-gray-500">Carregando informações...</span>
+                      </div>
+                    ) : informations.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        <p>Nenhuma informação recebida ainda</p>
+                        <p className="text-sm mt-1">As informações aparecerão aqui quando forem enviadas</p>
+                      </div>
+                    ) : (
+                      <div>
+                        {/* Informações de paginação */}
+                        <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+                          <span>
+                            Mostrando {startIndex + 1} a {Math.min(endIndex, informations.length)} de {informations.length} informações
+                          </span>
+                          {totalPages > 1 && (
+                            <span>
+                              Página {currentPage} de {totalPages}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Lista de informações */}
+                        <div className="space-y-4">
+                          {currentInformations.map((info, index) => (
+                          <motion.div
+                            key={info.id}
+                            className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: index * 0.1 }}
+                          >
+                            <div className="flex items-start justify-between mb-3">
+                            
+                              <div className="flex items-center gap-2 text-sm text-gray-500">
+                                <Clock className="w-4 h-4" />
+                                {new Date(info.createdAt).toLocaleDateString('pt-BR')}
+                              </div>
+                            </div>
+
+                            <div className="space-y-2 text-sm">
+                              {info.sightingLocation && (
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="w-4 h-4 text-gray-500" />
+                                  <span className="text-gray-700">
+                                    <strong>Local:</strong> {info.sightingLocation}
+                                  </span>
+                                </div>
+                              )}
+                              
+                              {info.sightingDate && (
+                                <div className="flex items-center gap-2">
+                                  <Calendar className="w-4 h-4 text-gray-500" />
+                                  <span className="text-gray-700">
+                                    <strong>Data do avistamento:</strong> {info.sightingDate}
+                                  </span>
+                                </div>
+                              )}
+
+                              {info.informantPhone && (
+                                <div className="flex items-center gap-2">
+                                  <Phone className="w-4 h-4 text-gray-500" />
+                                  <span className="text-gray-700">
+                                    <strong>Telefone:</strong> {info.informantPhone}
+                                  </span>
+                                </div>
+                              )}
+
+                              {info.informantEmail && (
+                                <div className="flex items-center gap-2">
+                                  <Mail className="w-4 h-4 text-gray-500" />
+                                  <span className="text-gray-700">
+                                    <strong>Email:</strong> {info.informantEmail}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="mt-3 pt-3 border-t border-gray-200">
+                              <p className="text-gray-700">
+                                <strong>Descrição:</strong>
+                              </p>
+                              <p className="text-gray-600 mt-1 leading-relaxed">
+                                {info.description || info.informacao || 'Sem descrição disponível'}
+                              </p>
+                            </div>
+
+                            {info.photos && (
+                              <div className="mt-3 pt-3 border-t border-gray-200">
+                                <p className="text-sm text-gray-700 mb-2">
+                                  <strong>Fotos anexadas:</strong> {info.photos.split(',').length} arquivo(s)
+                                </p>
+                                <div className="flex gap-2">
+                                  {info.photos.split(',').map((photo, photoIndex) => (
+                                    <div key={photoIndex} className="w-16 h-16 bg-gray-200 rounded border overflow-hidden">
+                                      <img
+                                        src={photo.trim()}
+                                        alt={`Anexo ${photoIndex + 1}`}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                          const target = e.target as HTMLImageElement;
+                                          target.src = '/sem-foto.svg';
+                                        }}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
+                              <span className={`text-xs px-2 py-1 rounded-full ${
+                                info.archived 
+                                  ? 'bg-gray-100 text-gray-600' 
+                                  : 'bg-green-100 text-green-600'
+                              }`}>
+                                {info.archived ? 'Arquivada' : 'Ativa'}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                ID: {info.id}
+                              </span>
+                            </div>
+                          </motion.div>
+                        ))}
+                        </div>
+
+                        {/* Controles de paginação */}
+                        {totalPages > 1 && (
+                          <motion.div 
+                            className="flex items-center justify-center gap-2 mt-6 pt-4 border-t border-gray-200"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.2 }}
+                          >
+                            {/* Botão Anterior */}
+                            <motion.button
+                              onClick={() => handlePageChange(currentPage - 1)}
+                              disabled={currentPage === 1}
+                              className={`flex items-center gap-1 px-3 py-2 text-sm rounded-md transition-colors ${
+                                currentPage === 1
+                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                              }`}
+                              whileHover={currentPage !== 1 ? { scale: 1.05 } : {}}
+                              whileTap={currentPage !== 1 ? { scale: 0.95 } : {}}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                              </svg>
+                              Anterior
+                            </motion.button>
+
+                            {/* Números das páginas */}
+                            <div className="flex items-center gap-1">
+                              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                                // Mostrar apenas algumas páginas ao redor da página atual
+                                const showPage = 
+                                  page === 1 || 
+                                  page === totalPages || 
+                                  (page >= currentPage - 1 && page <= currentPage + 1);
+
+                                if (!showPage) {
+                                  // Mostrar reticências se necessário
+                                  if (page === currentPage - 2 || page === currentPage + 2) {
+                                    return (
+                                      <span key={page} className="px-2 py-1 text-gray-400">
+                                        ...
+                                      </span>
+                                    );
+                                  }
+                                  return null;
+                                }
+
+                                return (
+                                  <motion.button
+                                    key={page}
+                                    onClick={() => handlePageChange(page)}
+                                    className={`px-3 py-2 text-sm rounded-md transition-colors ${
+                                      page === currentPage
+                                        ? 'bg-yellow-400 text-black font-medium'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                    }`}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                  >
+                                    {page}
+                                  </motion.button>
+                                );
+                              })}
+                            </div>
+
+                            {/* Botão Próximo */}
+                            <motion.button
+                              onClick={() => handlePageChange(currentPage + 1)}
+                              disabled={currentPage === totalPages}
+                              className={`flex items-center gap-1 px-3 py-2 text-sm rounded-md transition-colors ${
+                                currentPage === totalPages
+                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                              }`}
+                              whileHover={currentPage !== totalPages ? { scale: 1.05 } : {}}
+                              whileTap={currentPage !== totalPages ? { scale: 0.95 } : {}}
+                            >
+                              Próximo
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </motion.button>
+                          </motion.div>
+                        )}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
         </div>
       </div>
       <Toaster position="top-right" />

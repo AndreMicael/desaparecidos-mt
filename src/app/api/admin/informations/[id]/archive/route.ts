@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma';
 
-const prisma = new PrismaClient();
+// URL da API externa
+const EXTERNAL_API_URL = 'https://abitus-api.geia.vip/v1';
 
 export async function PATCH(
   request: NextRequest,
@@ -18,20 +18,34 @@ export async function PATCH(
       );
     }
 
-    const information = await prisma.information.update({
-      where: {
-        id: informationId
+    // Preparar FormData para arquivar/desarquivar
+    const formData = new FormData();
+    formData.append('archived', archived.toString());
+
+    // Fazer requisição para a API externa para arquivar/desarquivar
+    const response = await fetch(`${EXTERNAL_API_URL}/ocorrencias/informacoes-desaparecido/${informationId}/archive`, {
+      method: 'PATCH',
+      headers: {
+        // Headers de autenticação se necessário
+        // 'Authorization': `Bearer SEU_TOKEN_AQUI`,
       },
-      data: {
-        archived,
-        archivedAt: archived ? new Date() : null,
-        updatedAt: new Date()
-      }
+      body: formData,
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Erro da API externa:', errorText);
+      return NextResponse.json(
+        { error: 'Erro ao arquivar informação na API externa' },
+        { status: response.status }
+      );
+    }
+
+    const result = await response.json();
 
     return NextResponse.json({
       success: true,
-      data: information,
+      data: result,
       message: archived ? 'Informação arquivada' : 'Informação desarquivada'
     });
 

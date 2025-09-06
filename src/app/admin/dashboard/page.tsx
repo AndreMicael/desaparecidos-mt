@@ -20,19 +20,25 @@ interface Information {
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  // Campos da API externa
+  ocoId?: number;
+  informacao?: string;
+  descricao?: string;
+  data?: string;
+  files?: string[];
 }
 
 interface Person {
   id: number;
   nome: string;
   foto?: string;
+  ocoId?: number;
 }
 
 export default function AdminDashboard() {
   const [informations, setInformations] = useState<Information[]>([]);
   const [persons, setPersons] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedPerson, setSelectedPerson] = useState<string>('all');
   const [showDetails, setShowDetails] = useState<string | null>(null);
   const [showPhotoModal, setShowPhotoModal] = useState<string | null>(null);
@@ -48,10 +54,19 @@ export default function AdminDashboard() {
       return;
     }
 
-    loadData();
+    loadPersons();
   }, [router]);
 
-  const loadData = async () => {
+  useEffect(() => {
+    // Carregar informações quando uma pessoa for selecionada
+    if (selectedPerson && selectedPerson !== 'all') {
+      loadInformationsForPerson(selectedPerson);
+    } else {
+      setInformations([]);
+    }
+  }, [selectedPerson]);
+
+  const loadPersons = async () => {
     try {
       setLoading(true);
       
@@ -59,14 +74,64 @@ export default function AdminDashboard() {
       const personsResponse = await fetch('/api/pessoas?pageSize=1000');
       const personsData = await personsResponse.json();
       setPersons(personsData.data || []);
-
-      // Carregar informações
-      const informationsResponse = await fetch('/api/admin/informations');
-      const informationsData = await informationsResponse.json();
-      setInformations(informationsData.data || []);
+      
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
-      toast.error('Erro ao carregar dados');
+      console.error('Erro ao carregar pessoas:', error);
+      toast.error('Erro ao carregar pessoas');
+      setPersons([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadInformationsForPerson = async (personId: string) => {
+    if (!personId || personId === 'all') {
+      setInformations([]);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // Buscar informações específicas desta pessoa
+      const infoResponse = await fetch(`/api/admin/informations/pessoa/${personId}`);
+      const infoData = await infoResponse.json();
+      
+      if (infoData.success && infoData.data && Array.isArray(infoData.data)) {
+        // Mapear dados da API externa para o formato esperado pelo dashboard
+        const mappedInformations = infoData.data.map((info: any, index: number) => ({
+          id: info.id || `ext_${info.ocoId}_${personId}_${index}`,
+          personId: personId,
+          informantName: info.descricao || 'Informante Anônimo',
+          informantPhone: null,
+          informantEmail: null,
+          sightingDate: info.data || null,
+          sightingLocation: 'Local não especificado',
+          description: info.informacao || info.descricao || 'Sem descrição disponível',
+          photos: info.files ? info.files.join(',') : null,
+          archived: false,
+          archivedAt: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          // Campos originais da API externa
+          ocoId: info.ocoId,
+          informacao: info.informacao,
+          descricao: info.descricao,
+          data: info.data,
+          files: info.files
+        }));
+        
+        setInformations(mappedInformations);
+        console.log(`Informações encontradas para pessoa ${personId}:`, mappedInformations.length);
+      } else {
+        setInformations([]);
+        console.log('Nenhuma informação encontrada para pessoa:', personId);
+      }
+      
+    } catch (error) {
+      console.error('Erro ao carregar informações:', error);
+      toast.error('Erro ao carregar informações');
+      setInformations([]);
     } finally {
       setLoading(false);
     }
@@ -92,7 +157,10 @@ export default function AdminDashboard() {
       }
 
       toast.success(archive ? 'Informação arquivada' : 'Informação desarquivada');
-      loadData(); // Recarregar dados
+      // Recarregar informações da pessoa selecionada
+      if (selectedPerson && selectedPerson !== 'all') {
+        loadInformationsForPerson(selectedPerson);
+      }
     } catch (error) {
       console.error('Erro ao arquivar informação:', error);
       toast.error('Erro ao arquivar informação');
@@ -100,20 +168,13 @@ export default function AdminDashboard() {
   };
 
   const filteredInformations = informations.filter(info => {
-    const matchesSearch = 
-      info.informantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      info.sightingLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      info.description.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesPerson = selectedPerson === 'all' || info.personId === selectedPerson;
     const matchesTab = activeTab === 'active' ? !info.archived : info.archived;
-    
-    return matchesSearch && matchesPerson && matchesTab;
+    return matchesTab;
   });
 
   const getPersonName = (personId: string) => {
     const person = persons.find(p => p.id.toString() === personId);
-    return person ? person.nome : 'Pessoa não encontrada';
+    return person ? person.nome : `Pessoa ${personId}`;
   };
 
   const getPersonPhoto = (personId: string) => {
@@ -168,129 +229,119 @@ export default function AdminDashboard() {
       </motion.div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Filtros */}
+        {/* Seletor de Pessoa */}
         <motion.div 
           className="bg-white rounded-lg shadow-sm p-6 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-black" />
-                <input
-                  type="text"
-                  placeholder="Buscar por nome, local ou descrição..."
-                  className="w-full pl-10 pr-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="md:w-64">
-              <select
-                className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-                value={selectedPerson}
-                onChange={(e) => setSelectedPerson(e.target.value)}
-              >
-                <option value="all">Todas as pessoas</option>
-                {persons.map(person => (
-                  <option key={person.id} value={person.id.toString()}>
-                    {person.nome}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="max-w-md">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Selecione uma pessoa desaparecida:
+            </label>
+            <select
+              className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+              value={selectedPerson}
+              onChange={(e) => setSelectedPerson(e.target.value)}
+            >
+              <option value="all">Selecione uma pessoa...</option>
+              {persons.map(person => (
+                <option key={person.id} value={person.id.toString()}>
+                  {person.nome}
+                </option>
+              ))}
+            </select>
           </div>
         </motion.div>
 
         {/* Estatísticas */}
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <FileText className="w-6 h-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total de Informações</p>
-                <p className="text-2xl font-bold text-gray-900">{informations.length}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <User className="w-6 h-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Pessoas Únicas</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {new Set(informations.map(info => info.personId)).size}
-                </p>
+        {selectedPerson !== 'all' && (
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <FileText className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total de Informações</p>
+                  <p className="text-2xl font-bold text-gray-900">{informations.length}</p>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Calendar className="w-6 h-6 text-yellow-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Hoje</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {informations.filter(info => {
-                    const today = new Date().toDateString();
-                    const infoDate = new Date(info.createdAt).toDateString();
-                    return today === infoDate;
-                  }).length}
-                </p>
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <User className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Pessoa Selecionada</p>
+                  <p className="text-lg font-bold text-gray-900">
+                    {getPersonName(selectedPerson)}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </motion.div>
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <Calendar className="w-6 h-6 text-yellow-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Com Fotos</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {informations.filter(info => info.photos && info.photos.trim()).length}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Lista de Informações */}
-        <motion.div 
-          className="bg-white rounded-lg shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.3 }}
-        >
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Informações Recebidas</h2>
-              
-              {/* Abas */}
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setActiveTab('active')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === 'active'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Ativas ({informations.filter(info => !info.archived).length})
-                </button>
-                <button
-                  onClick={() => setActiveTab('archived')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === 'archived'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Arquivadas ({informations.filter(info => info.archived).length})
-                </button>
+        {selectedPerson !== 'all' && (
+          <motion.div 
+            className="bg-white rounded-lg shadow-sm"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+          >
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Informações de {getPersonName(selectedPerson)}
+                </h2>
+                
+                {/* Abas */}
+                <div className="flex bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setActiveTab('active')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      activeTab === 'active'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    Ativas ({informations.filter(info => !info.archived).length})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('archived')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      activeTab === 'archived'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    Arquivadas ({informations.filter(info => info.archived).length})
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
           
           <div className="divide-y divide-gray-200">
             {filteredInformations.length === 0 ? (
@@ -424,8 +475,9 @@ export default function AdminDashboard() {
               ))
             )}
           </div>
-                 </motion.div>
-       </div>
+          </motion.div>
+        )}
+      </div>
 
        {/* Modal de Fotos */}
        <AnimatePresence>

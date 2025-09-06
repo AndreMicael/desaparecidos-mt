@@ -672,32 +672,6 @@ docker run -it -p 3000:3000 --name desaparecidos-mt-container desaparecidos-mt:l
 docker run -d -p 3000:3000 -v $(pwd)/public/infos:/app/public/infos --name desaparecidos-mt-container desaparecidos-mt:latest
 ```
 
-#### **3. Scripts de Execução**
-
-**Windows (PowerShell):**
-```powershell
-# Build e run
-.\docker-run.ps1
-
-# Apenas build
-.\docker-run.ps1 --build-only
-
-# Apenas run
-.\docker-run.ps1 --run-only
-```
-
-**Linux/macOS:**
-```bash
-# Build e run
-./docker-run.sh
-
-# Apenas build
-./docker-run.sh --build-only
-
-# Apenas run
-./docker-run.sh --run-only
-```
-
 ### 📊 Otimizações Implementadas
 
 #### **1. Multi-Stage Build**

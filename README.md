@@ -134,51 +134,6 @@ npm run dev
 - `docker build -t desaparecidos-mt:latest .` - Build da imagem Docker
 - `docker run -d -p 3000:3000 --name desaparecidos-mt-container desaparecidos-mt:latest` - Executar container
 
-
-## 📁 Estrutura do projeto
-
-```text
-src/
-  app/
-    admin/                    # Área administrativa
-      dashboard/page.tsx      # Dashboard com gerenciamento
-      login/page.tsx          # Página de login
-    api/                      # Endpoints da aplicação
-      admin/informations/     # APIs administrativas
-      pessoas/                # API de pessoas desaparecidas
-      upload/                 # Upload de arquivos
-      informations/           # Submissão de informações
-    desaparecidos/pessoa/[id]/ # Detalhes de pessoa desaparecida
-    localizados/pessoa/[id]/   # Detalhes de pessoa localizada
-    como-ajudar/              # Página informativa
-    contato/                  # Página de contato
-    page.tsx                  # Página inicial
-    layout.tsx                # Layout principal
-    globals.css               # Estilos globais
-  
-  components/
-    Header.tsx                # Cabeçalho com login/logout
-    HeroSection.tsx           # Banner principal
-    HomePage.tsx              # Página inicial
-    SearchForm.tsx            # Formulário de busca
-    PersonCard.tsx            # Card de pessoa
-    InformationForm.tsx       # Formulário de informações
-    Footer.tsx                # Rodapé
-    ui/                       # Componentes reutilizáveis
-  
-  types/
-    person.ts                 # Tipos TypeScript
-
-public/
-  infos/                      # Fotos enviadas pelos usuários
-  bg-hero.jpg                 # Imagem de fundo
-  *.svg                       # Ícones e logos
-
-# Docker
-Dockerfile                    # Configuração multi-stage Docker
-.dockerignore                 # Arquivos excluídos do build
-```
-
 ## 🔧 Funcionalidades
 
 ### Área Pública
@@ -263,19 +218,6 @@ O projeto inclui uma suíte completa de testes Jest para todas as APIs externas 
 - `jest.api.config.js` - Configuração específica para testes de API
 - `jest.api.setup.js` - Setup global para testes
 
-#### Configuração Jest
-```javascript
-// jest.api.config.js
-const customJestConfig = {
-  testEnvironment: 'node',
-  testMatch: ['<rootDir>/src/app/api/__tests__/**/*.test.ts'],
-  collectCoverageFrom: ['src/app/api/**/*.{js,ts}'],
-  coverageDirectory: 'coverage/api',
-  testTimeout: 10000,
-  setupFiles: ['<rootDir>/jest.api.setup.js']
-};
-```
-
 ### 🎯 Cobertura de Testes
 
 #### APIs Externas (`external-apis.test.ts`)
@@ -320,66 +262,6 @@ const customJestConfig = {
 - ✅ Tratamento de pessoa não encontrada
 - ✅ Tratamento de erro interno do servidor
 - ✅ Validação de IDs
-
-
-### 🔧 Funcionalidades dos Testes
-
-#### Mocking Avançado
-```typescript
-// Mock do fetch global
-global.fetch = jest.fn();
-
-// Mock do NextRequest
-const createMockRequest = (url: string, searchParams?: Record<string, string>) => {
-  const urlObj = new URL(url);
-  if (searchParams) {
-    Object.entries(searchParams).forEach(([key, value]) => {
-      urlObj.searchParams.set(key, value);
-    });
-  }
-  return { url: urlObj.toString(), nextUrl: urlObj } as NextRequest;
-};
-
-// Mock do FormData
-const createMockFormData = (data: Record<string, any>): FormData => {
-  const formData = new FormData();
-  Object.entries(data).forEach(([key, value]) => {
-    if (Array.isArray(value)) {
-      value.forEach(item => formData.append(key, item));
-    } else {
-      formData.append(key, value);
-    }
-  });
-  return formData;
-};
-```
-
-#### Dados de Teste Realistas
-```typescript
-// Mock de dados globais
-global.mockApiData = {
-  pessoas: {
-    content: [
-      {
-        id: 1,
-        nome: 'João Silva',
-        idade: 25,
-        sexo: 'MASCULINO',
-        status: 'DESAPARECIDO',
-        ultimaOcorrencia: { ocoId: 123 }
-      }
-    ],
-    totalElements: 1
-  },
-  estatisticas: { total: 100, localizadas: 25 },
-  informacoes: {
-    id: 1,
-    informacoes: 'Informação de teste',
-    data: '2024-01-15',
-    local: 'Centro da cidade'
-  }
-};
-```
 
 ### 🚀 Como Executar os Testes
 
@@ -435,83 +317,6 @@ npm run test:api -- --testNamePattern="deve retornar lista de pessoas"
 - **Sanitização**: Tratamento de dados maliciosos
 - **Controle de acesso**: Verificação de permissões
 
-### 🎯 Exemplos de Testes
-
-#### Teste de Sucesso
-```typescript
-it('deve retornar lista de pessoas com paginação', async () => {
-  const mockResponse = {
-    content: [{ id: 1, nome: 'João Silva', idade: 25 }],
-    totalElements: 1
-  };
-
-  (global.fetch as jest.Mock).mockResolvedValueOnce({
-    ok: true,
-    json: () => Promise.resolve(mockResponse)
-  });
-
-  const request = createMockRequest('/api/pessoas', { page: '1' });
-  const response = await getPessoas(request);
-  const data = await response.json();
-
-  expect(response.status).toBe(200);
-  expect(data.data).toHaveLength(1);
-  expect(data.total).toBe(1);
-});
-```
-
-#### Teste de Erro
-```typescript
-it('deve tratar erro da API externa', async () => {
-  (global.fetch as jest.Mock).mockResolvedValueOnce({
-    ok: false,
-    status: 500,
-    statusText: 'Internal Server Error'
-  });
-
-  const request = createMockRequest('/api/pessoas');
-  const response = await getPessoas(request);
-  const data = await response.json();
-
-  expect(response.status).toBe(500);
-  expect(data.error).toBe('Erro interno do servidor');
-});
-```
-
-#### Teste de Integração
-```typescript
-it('deve processar fluxo completo de busca e envio de informações', async () => {
-  // 1. Buscar pessoas
-  const pessoasResponse = await getPessoas(request);
-  expect(pessoasResponse.status).toBe(200);
-
-  // 2. Enviar informação
-  const infoResponse = await postInformationsExternal(mockRequest);
-  expect(infoResponse.status).toBe(200);
-  expect(infoData.success).toBe(true);
-});
-```
-
-### 📈 Métricas de Qualidade
-
-#### Cobertura de Código
-- **APIs Públicas**: 100% de cobertura
-- **APIs Administrativas**: 100% de cobertura
-- **Tratamento de Erros**: 100% de cenários cobertos
-- **Validações**: 100% dos casos de validação
-
-#### Cenários Testados
-- ✅ **24 testes** executando com sucesso
-- ✅ **0 falhas** nos testes
-- ✅ **100% de cobertura** das APIs
-- ✅ **Tempo de execução** < 3 segundos
-
-#### Tipos de Cenário
-- **Cenários de sucesso**: 13 testes
-- **Cenários de erro**: 6 testes
-- **Cenários de validação**: 3 testes
-- **Cenários de integração**: 2 testes
-
 ### 🔧 Configuração e Manutenção
 
 #### Adicionando Novos Testes
@@ -564,17 +369,6 @@ it('deve processar fluxo completo de busca e envio de informações', async () =
 
 
 ## 🚀 Deploy e produção
-
-### Variáveis de Ambiente Necessárias
-```env
-# URLs da aplicação (opcional para produção)
-NEXT_PUBLIC_APP_URL="https://seudominio.com"
-```
-
-### Preparação para Deploy
-1. **Configure as variáveis** de ambiente
-2. **Build da aplicação** com `npm run build`
-3. **Configure a pasta de upload** com permissões adequadas
 
 ### Estrutura de Arquivos em Produção
 - `/public/infos/` - Pasta para upload de fotos (necessita permissão de escrita)

@@ -95,8 +95,8 @@ O sistema funciona como um **proxy inteligente** para a API externa do Abitus:
 
 ### 1. Clone e acesse o projeto
 ```bash
-git clone [url-do-repositorio]
-cd desaparecidos/desaparecidos-mt
+git clone https://github.com/AndreMicael/desaparecidos-mt
+cd desaparecidos-mt
 ```
 
 ### 2. Instale as dependências

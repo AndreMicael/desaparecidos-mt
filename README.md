@@ -11,7 +11,7 @@
  
 ---
 
-Sistema completo para divulgação e gerenciamento de informações sobre pessoas desaparecidas, desenvolvido com Next.js 15, TypeScript e MySQL. O projeto inclui área pública para busca e submissão de informações, área administrativa para gerenciamento, e integração com API externa do Abitus para sincronização de dados.
+Sistema completo para divulgação e gerenciamento de informações sobre pessoas desaparecidas, desenvolvido com Next.js 15 e TypeScript. O projeto inclui área pública para busca e submissão de informações, área administrativa para gerenciamento, e integração com API externa do Abitus para sincronização de dados.
 
 ## 🚀 Funcionalidades Principais
 
@@ -34,7 +34,7 @@ Sistema completo para divulgação e gerenciamento de informações sobre pessoa
 ## 📋 Sumário
 - [Tecnologias](#tecnologias)
 - [Pré-requisitos](#pré-requisitos)
-- [Configuração do Banco](#configuração-do-banco)
+- [Arquitetura do Sistema](#arquitetura-do-sistema)
 - [Como rodar o projeto](#como-rodar-o-projeto)
 - [Funcionalidades](#funcionalidades)
 - [Estrutura do projeto](#estrutura-do-projeto)
@@ -75,25 +75,21 @@ Sistema completo para divulgação e gerenciamento de informações sobre pessoa
 - **Node.js 18+** (recomendado LTS)
 - **npm 9+** (ou yarn/pnpm/bun)
 
+## 🏗️ Arquitetura do Sistema
 
-### Estrutura do Banco
-O sistema criará automaticamente as seguintes tabelas:
-- `informations` - Informações submetidas pelos cidadãos
-- `photos` - Metadados das fotos (opcional para expansão futura)
+O sistema funciona como um **proxy inteligente** para a API externa do Abitus:
 
-### Campos da Tabela `informations`:
-- `id` - Identificador único
-- `personId` - ID da pessoa desaparecida
-- `informantName` - Nome do informante
-- `informantPhone` - Telefone (opcional)
-- `informantEmail` - Email (opcional)
-- `sightingDate` - Data do avistamento
-- `sightingLocation` - Local do avistamento
-- `description` - Descrição detalhada
-- `photos` - URLs das fotos (separadas por vírgula)
-- `archived` - Status de arquivamento
-- `archivedAt` - Data do arquivamento
-- `createdAt` / `updatedAt` - Timestamps
+- **Dados das pessoas**: Obtidos diretamente da API do Abitus
+- **Informações submetidas**: Enviadas para a API externa do Abitus
+- **Upload de fotos**: Salvas localmente na pasta `public/infos/`
+- **Área administrativa**: Gerencia informações através da API externa
+- **Sem banco de dados local**: Tudo é gerenciado via API externa
+
+### Fluxo de Dados
+1. **Busca de pessoas** → API Abitus
+2. **Submissão de informações** → API Abitus + Upload local de fotos
+3. **Gerenciamento administrativo** → API Abitus
+4. **Estatísticas** → Calculadas via API Abitus
 
 ## 🚀 Como rodar o projeto
 
@@ -108,18 +104,12 @@ cd desaparecidos/desaparecidos-mt
 npm install
 ```
 
-### 3. Configure o banco de dados
-```bash
-# Configure suas variáveis de ambiente no arquivo .env
-DATABASE_URL="mysql://usuario:senha@host:porta/database"
-```
-
-### 4. Execute o servidor de desenvolvimento
+### 3. Execute o servidor de desenvolvimento
 ```bash
 npm run dev
 ```
 
-### 5. Acesse a aplicação
+### 4. Acesse a aplicação
 - **Área pública**: `http://localhost:3000`
 - **Área administrativa**: `http://localhost:3000/admin/login`
   - **Login**: admin
@@ -173,9 +163,6 @@ public/
   infos/                      # Fotos enviadas pelos usuários
   bg-hero.jpg                 # Imagem de fundo
   *.svg                       # Ícones e logos
-
-prisma/
-  schema.prisma               # Esquema do banco de dados
 ```
 
 ## 🔧 Funcionalidades
@@ -579,19 +566,14 @@ it('deve processar fluxo completo de busca e envio de informações', async () =
 
 ### Variáveis de Ambiente Necessárias
 ```env
-# Banco de dados
-DATABASE_URL="mysql://usuario:senha@host:porta/database"
-
 # URLs da aplicação (opcional para produção)
 NEXT_PUBLIC_APP_URL="https://seudominio.com"
 ```
 
 ### Preparação para Deploy
-1. **Configure o banco de dados** em produção
-2. **Execute as migrações** do Prisma
-3. **Gere o cliente** Prisma para produção
-4. **Configure as variáveis** de ambiente
-5. **Build da aplicação** com `npm run build`
+1. **Configure as variáveis** de ambiente
+2. **Build da aplicação** com `npm run build`
+3. **Configure a pasta de upload** com permissões adequadas
 
 ### Estrutura de Arquivos em Produção
 - `/public/infos/` - Pasta para upload de fotos (necessita permissão de escrita)
@@ -602,7 +584,6 @@ NEXT_PUBLIC_APP_URL="https://seudominio.com"
 - [x] **Testes Jest completos** - Suíte de testes para todas as APIs
 - [ ] Autenticação JWT robusta
 - [ ] Rate limiting nas APIs
-- [ ] Backup automático do banco
 - [ ] CDN para imagens
 - [ ] Monitoramento de performance
 - [ ] Logs estruturados
@@ -613,14 +594,9 @@ NEXT_PUBLIC_APP_URL="https://seudominio.com"
 
 ### Problemas Comuns
 
-**Erro: "Cannot find module 'mysql2'"**
-```bash
-npm install mysql2
-```
-
-**Erro: "DATABASE_URL not found"**
-- Verifique se o arquivo `.env` existe na raiz
-- Confirme a string de conexão MySQL
+**Erro de conexão com API externa**
+- Verifique sua conexão com a internet
+- Confirme se a API do Abitus está funcionando
 
 **Fotos não aparecem no dashboard**
 - Verifique se a pasta `public/infos` tem permissão de escrita
@@ -639,7 +615,7 @@ npm install mysql2
 O sistema inclui logs detalhados no console para:
 - Carregamento de imagens
 - Submissão de formulários
-- Operações do banco de dados
+- Comunicação com API externa
 - Upload de arquivos
 
 ---
@@ -658,5 +634,3 @@ Este sistema foi desenvolvido para apoiar o trabalho da **Polícia Civil do Esta
 - Abra uma issue detalhando o problema
 - Inclua prints de tela se relevante
 - Descreva os passos para reproduzir
-
-**Desenvolvido com ❤️ para salvar vidas e reunir famílias.**

@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma';
-
-const prisma = new PrismaClient();
 
 // URL da API externa
 const EXTERNAL_API_URL = 'https://abitus-api.geia.vip/v1';
@@ -146,60 +143,15 @@ export async function POST(request: NextRequest) {
       useExternalAPI = false;
     }
 
-    // Se API externa não funcionou, usar fallback local
+    // Se API externa não funcionou, retornar erro
     if (!useExternalAPI) {
-      console.log('Usando fallback local - salvando informações no banco local');
+      console.log('API externa indisponível - retornando erro');
       
-      try {
-        // Salvar no banco local como fallback
-        const information = await prisma.information.create({
-          data: {
-            personId,
-            informantName,
-            informantPhone: informantPhone || null,
-            informantEmail: informantEmail || null,
-            sightingDate: formattedDate ? new Date(formattedDate) : null,
-            sightingLocation,
-            description,
-            photos: photos.map(file => file.name).join(','), // Salvar nomes dos arquivos
-          },
-        });
-
-        return NextResponse.json({
-          success: true,
-          data: information,
-          message: 'Informações salvas localmente (API externa indisponível)',
-          warning: 'API externa não está disponível. Dados salvos no banco local.'
-        });
-      } catch (dbError) {
-        console.error('Erro ao salvar no banco local:', dbError);
-        
-        // Se nem o banco local funcionar, retornar dados em memória
-        const localData = {
-          id: `temp_${Date.now()}`,
-          personId,
-          informantName,
-          informantPhone,
-          informantEmail,
-          sightingDate: formattedDate,
-          sightingLocation,
-          description,
-          photos: photos.map(file => ({
-            name: file.name,
-            size: file.size,
-            type: file.type
-          })),
-          createdAt: new Date().toISOString(),
-          source: 'memory_fallback'
-        };
-
-        return NextResponse.json({
-          success: true,
-          data: localData,
-          message: 'Informações processadas (sistemas de armazenamento indisponíveis)',
-          warning: 'API externa e banco local indisponíveis. Dados processados em memória.'
-        });
-      }
+      return NextResponse.json({
+        success: false,
+        message: 'API externa não está disponível no momento. Tente novamente mais tarde.',
+        error: 'Serviço temporariamente indisponível'
+      }, { status: 503 });
     }
 
     // Se chegou aqui, API externa funcionou

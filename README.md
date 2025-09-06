@@ -11,7 +11,9 @@
  
 ---
 
-Sistema completo para divulgação e gerenciamento de informações sobre pessoas desaparecidas, desenvolvido com Next.js 15 e TypeScript. O projeto inclui área pública para busca e submissão de informações, área administrativa para gerenciamento, e integração com API externa do Abitus para sincronização de dados.
+Sistema completo para divulgação e gerenciamento de informações sobre pessoas desaparecidas, desenvolvido com Next.js 15 e TypeScript. O projeto inclui área pública para busca e submissão de informações, área administrativa para gerenciamento, e integração com API externa do Abitus para sincronização de dados. 
+
+Este projeto é parte de um teste prático para vaga de Desenvolvedor Júnior e não representa um projeto verdadeiro e não tem nenhum envolvimento com a Polícia Civil de MT.
 
 ## 🚀 Funcionalidades Principais
 

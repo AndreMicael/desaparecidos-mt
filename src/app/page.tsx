@@ -3,12 +3,14 @@
 import { useState, useEffect, Suspense } from 'react';
 import { Person } from '@/types/person';
 import { toast } from 'sonner';
-import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HeroSection } from '@/components/HeroSection';
 import { PersonCard } from '@/components/PersonCard';
 import { SearchFilters } from '@/types/person';
+import { usePagination } from '@/hooks/usePagination';
+import { Pagination } from '@/components/ui/pagination';
 import dynamic from 'next/dynamic';
 
 // Lazy loading dos componentes
@@ -30,16 +32,18 @@ function HomePageContent() {
   const [persons, setPersons] = useState<Person[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalPessoas, setTotalPessoas] = useState(449);
   const [pessoasLocalizadas, setPessoasLocalizadas] = useState(23);
   
-  const pageSize = 12;
+  const { currentPage, pageSize, setPage, setPageSize, updateUrl } = usePagination({
+    defaultPageSize: 12,
+    defaultPage: 1
+  });
 
   useEffect(() => {
-    // Carregar dados iniciais apenas uma vez
-    loadPersons(1);
-  }, []);
+    // Carregar dados quando página ou pageSize mudarem
+    loadPersons(currentPage);
+  }, [currentPage, pageSize]);
 
   const loadPersons = async (page: number = 1, filters?: SearchFilters) => {
     try {
@@ -81,41 +85,34 @@ function HomePageContent() {
   };
 
   const handleSearch = async (filters: SearchFilters) => {
-    setCurrentPage(1);
+    // Reset para página 1 ao fazer nova busca
+    setPage(1);
     
-    // Executar a busca diretamente sem atualizar a URL
+    // Executar a busca diretamente
     await loadPersons(1, filters);
     
-    // Atualizar a URL apenas após a busca ser concluída
-    const params = new URLSearchParams();
-    params.set('page', '1');
+    // Atualizar a URL com os filtros
+    const params: Record<string, string> = {};
     
-    if (filters.nome) params.set('nome', filters.nome);
-    if (filters.idadeMinima) params.set('idadeMinima', filters.idadeMinima);
-    if (filters.idadeMaxima) params.set('idadeMaxima', filters.idadeMaxima);
+    if (filters.nome) params.nome = filters.nome;
+    if (filters.idadeMinima) params.idadeMinima = filters.idadeMinima;
+    if (filters.idadeMaxima) params.idadeMaxima = filters.idadeMaxima;
     if (filters.sexos && filters.sexos.length > 0) {
-      params.set('sexos', filters.sexos.join(','));
+      params.sexos = filters.sexos.join(',');
     }
     if (filters.status && filters.status.length > 0) {
-      params.set('status', filters.status.join(','));
+      params.status = filters.status.join(',');
     }
     
-    // Usar push em vez de replace para evitar conflitos
-    router.push(`/?${params.toString()}`, { scroll: false });
+    updateUrl(params);
   };
 
   const handleClear = () => {
-    setCurrentPage(1);
+    setPage(1);
     loadPersons(1);
     router.push('/');
   };
 
-  const navigateToPage = (page: number) => {
-    setCurrentPage(page);
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', page.toString());
-    router.push(`/?${params.toString()}#resultados`);
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -272,47 +269,15 @@ function HomePageContent() {
           </AnimatePresence>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <motion.div 
-              className="flex justify-center items-center gap-4"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 1.0 }}
-            >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  onClick={() => navigateToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                  className="flex items-center gap-2 bg-transparent border-2 border-yellow-400 text-gray-700 hover:bg-[#877a4e] hover:text-white disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Anterior
-                </Button>
-              </motion.div>
-              
-              <motion.span 
-                className="text-gray-700 font-medium"
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                Página {currentPage} de {totalPages}
-              </motion.span>
-              
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  onClick={() => navigateToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  variant="outline"
-                  className="flex items-center gap-2 bg-transparent border-2 border-yellow-400 text-gray-700 hover:bg-[#877a4e] hover:text-white disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400"
-                >
-                  Próxima
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </motion.div>
-            </motion.div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            totalItems={totalPessoas}
+            className="mt-8"
+          />
 
           {/* No Results */}
           <AnimatePresence>

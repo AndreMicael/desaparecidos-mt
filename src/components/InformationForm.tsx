@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Upload, Trash2, Calendar, MapPin, User, Phone, Mail, FileText, Eye, EyeOff } from 'lucide-react';
+import { X, Upload, Trash2, Calendar, MapPin, User, Phone, Mail, FileText, Eye, EyeOff, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface InformationFormProps {
@@ -39,6 +39,7 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (field: keyof FormData, value: string | boolean) => {
@@ -78,27 +79,135 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     
+    // Validação: máximo de 5 fotos
     if (photos.length + files.length > 5) {
       toast.error('Máximo de 5 fotos permitido');
       return;
     }
 
+    // Validação: tipos de arquivo permitidos
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    const invalidFiles = files.filter(file => !allowedTypes.includes(file.type));
+    
+    if (invalidFiles.length > 0) {
+      toast.error('Apenas arquivos de imagem são permitidos (JPG, PNG, GIF, WebP)');
+      return;
+    }
+
+    // Validação: tamanho máximo de 5MB por arquivo
+    const maxSize = 5 * 1024 * 1024; // 5MB em bytes
+    const oversizedFiles = files.filter(file => file.size > maxSize);
+    
+    if (oversizedFiles.length > 0) {
+      toast.error('Cada arquivo deve ter no máximo 5MB');
+      return;
+    }
+
+    // Validação: tamanho total não pode exceder 25MB (5 arquivos × 5MB)
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    const currentTotalSize = photos.reduce((sum, file) => sum + file.size, 0);
+    
+    if (currentTotalSize + totalSize > 25 * 1024 * 1024) {
+      toast.error('Tamanho total dos arquivos não pode exceder 25MB');
+      return;
+    }
+
+    // Adicionar arquivos válidos
     const newPhotos = [...photos, ...files];
     setPhotos(newPhotos);
 
-    // Criar previews
-    files.forEach(file => {
+    // Criar previews com tratamento de erro
+    files.forEach((file, index) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setPhotoPreviews(prev => [...prev, e.target?.result as string]);
       };
+      reader.onerror = () => {
+        toast.error(`Erro ao processar a imagem: ${file.name}`);
+        // Remover arquivo que falhou no processamento
+        setPhotos(prev => prev.filter((_, i) => i !== photos.length + index));
+      };
       reader.readAsDataURL(file);
     });
+
+    // Toast de sucesso
+    if (files.length === 1) {
+      toast.success(`${files.length} foto adicionada com sucesso!`);
+    } else {
+      toast.success(`${files.length} fotos adicionadas com sucesso!`);
+    }
+
+    // Limpar input para permitir selecionar o mesmo arquivo novamente
+    event.target.value = '';
   };
 
   const removePhoto = (index: number) => {
     setPhotos(prev => prev.filter((_, i) => i !== index));
     setPhotoPreviews(prev => prev.filter((_, i) => i !== index));
+    toast.success('Foto removida com sucesso!');
+  };
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocalização não é suportada neste navegador');
+      return;
+    }
+
+    setIsGettingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          
+          // Usar a API de geocodificação reversa para obter o endereço
+          const response = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=pt`
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            const address = `${data.locality || ''}, ${data.principalSubdivision || ''}, ${data.countryName || ''}`.replace(/^,\s*|,\s*$/g, '');
+            handleInputChange('sightingLocation', address);
+            toast.success('Localização obtida com sucesso!');
+          } else {
+            // Fallback: usar coordenadas se a API falhar
+            handleInputChange('sightingLocation', `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+            toast.success('Coordenadas obtidas com sucesso!');
+          }
+        } catch (error) {
+          console.error('Erro ao obter endereço:', error);
+          // Fallback: usar coordenadas
+          const { latitude, longitude } = position.coords;
+          handleInputChange('sightingLocation', `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+          toast.success('Coordenadas obtidas com sucesso!');
+        } finally {
+          setIsGettingLocation(false);
+        }
+      },
+      (error) => {
+        setIsGettingLocation(false);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error('Permissão de localização negada. Use o campo de texto.');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error('Localização indisponível. Use o campo de texto.');
+            break;
+          case error.TIMEOUT:
+            toast.error('Tempo limite excedido. Use o campo de texto.');
+            break;
+          default:
+            toast.error('Erro ao obter localização. Use o campo de texto.');
+            break;
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutos
+      }
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -349,17 +458,43 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Local do Avistamento *
                     </label>
-                                       <div className="relative">
-                     <MapPin className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-                     <input
-                       type="text"
-                       value={formData.sightingLocation}
-                       onChange={(e) => handleInputChange('sightingLocation', e.target.value)}
-                       className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-black"
-                       placeholder="Endereço, bairro, cidade..."
-                       required
-                     />
-                   </div>
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          value={formData.sightingLocation}
+                          onChange={(e) => handleInputChange('sightingLocation', e.target.value)}
+                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-black"
+                          placeholder="Endereço, bairro, cidade..."
+                          required
+                        />
+                      </div>
+                      <motion.button
+                        type="button"
+                        onClick={getCurrentLocation}
+                        disabled={isGettingLocation}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yellow-400 text-white rounded-md hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        {isGettingLocation ? (
+                          <>
+                            <motion.div 
+                              className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            />
+                            Obtendo localização...
+                          </>
+                        ) : (
+                          <>
+                            <Navigation className="w-4 h-4" />
+                            Usar minha localização
+                          </>
+                        )}
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
 
@@ -393,7 +528,7 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
                     ref={fileInputRef}
                     type="file"
                     multiple
-                    accept="image/*"
+                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                     onChange={handlePhotoUpload}
                     className="hidden"
                   />
@@ -405,7 +540,7 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
                         Clique para selecionar fotos ou arraste aqui
                       </p>
                       <p className="text-sm text-gray-500">
-                        Máximo 5 fotos • JPG, PNG, GIF
+                        Máximo 5 fotos • 5MB por arquivo • JPG, PNG, GIF, WebP
                       </p>
                       <motion.button
                         type="button"
@@ -433,6 +568,9 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
                               alt={`Preview ${index + 1}`}
                               className="w-full h-24 object-cover rounded-md"
                             />
+                            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-md">
+                              {photos[index] ? `${(photos[index].size / 1024 / 1024).toFixed(1)}MB` : ''}
+                            </div>
                             <motion.button
                               type="button"
                               onClick={() => removePhoto(index)}
@@ -447,15 +585,20 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
                       </div>
                       
                       {photoPreviews.length < 5 && (
-                        <motion.button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          Adicionar Mais Fotos
-                        </motion.button>
+                        <div className="text-center">
+                          <motion.button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            Adicionar Mais Fotos ({photoPreviews.length}/5)
+                          </motion.button>
+                          <p className="text-xs text-gray-500 mt-2">
+                            {5 - photoPreviews.length} foto(s) restante(s)
+                          </p>
+                        </div>
                       )}
                     </div>
                   )}

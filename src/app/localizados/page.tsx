@@ -4,9 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { Person } from '@/types/person';
 import { toast } from 'sonner';
-import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePagination } from '@/hooks/usePagination';
+import { Pagination } from '@/components/ui/pagination';
 
 // Lazy loading dos componentes
 const PersonCard = dynamic(() => import('@/components/PersonCard').then(mod => ({ default: mod.PersonCard })), {
@@ -27,13 +29,16 @@ export default function LocalizadosPage() {
   const [persons, setPersons] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   
-  const pageSize = 12;
-  const currentPage = 1; // Sempre página 1 para a rota principal
+  const { currentPage, pageSize, setPage, setPageSize } = usePagination({
+    defaultPageSize: 12,
+    defaultPage: 1
+  });
 
   useEffect(() => {
     loadLocalizados();
-  }, []);
+  }, [currentPage, pageSize]);
 
   useEffect(() => {
     // Scroll para a seção de resultados quando a página carregar
@@ -63,6 +68,7 @@ export default function LocalizadosPage() {
 
       const result = await response.json();
       setPersons(result.data);
+      setTotalItems(result.total);
       setTotalPages(Math.ceil(result.total / pageSize));
     } catch (error) {
       console.error('Erro ao carregar pessoas localizadas:', error);
@@ -72,13 +78,6 @@ export default function LocalizadosPage() {
     }
   };
 
-  const navigateToPage = (page: number) => {
-    if (page === 1) {
-      router.push('/localizados');
-    } else {
-      router.push(`/localizados/${page}`);
-    }
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -190,47 +189,15 @@ export default function LocalizadosPage() {
           </AnimatePresence>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <motion.div 
-              className="flex justify-center items-center gap-4"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 1.0 }}
-            >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  onClick={() => navigateToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                  className="flex items-center gap-2 bg-transparent border-2 border-yellow-400 text-gray-700 hover:bg-[#877a4e] hover:text-white disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Anterior
-                </Button>
-              </motion.div>
-              
-              <motion.span 
-                className="text-gray-700 font-medium"
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                Página {currentPage} de {totalPages}
-              </motion.span>
-              
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  onClick={() => navigateToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  variant="outline"
-                  className="flex items-center gap-2 bg-transparent border-2 border-yellow-400 text-gray-700 hover:bg-[#877a4e] hover:text-white disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400"
-                >
-                  Próxima
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </motion.div>
-            </motion.div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            totalItems={totalItems}
+            className="mt-8"
+          />
 
           {/* No Results */}
           <AnimatePresence>

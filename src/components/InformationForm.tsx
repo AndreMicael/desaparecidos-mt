@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Trash2, Calendar, MapPin, User, Phone, Mail, FileText, Eye, EyeOff, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
 import { config } from '@/lib/config';
+import { PrivacyNotice } from './PrivacyNotice';
+import { buildReverseGeocodingUrl } from '@/lib/urls';
 
 interface InformationFormProps {
   isOpen: boolean;
@@ -162,7 +164,7 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
           
           // Usar a API de geocodificação reversa para obter o endereço
           const response = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=pt`
+            buildReverseGeocodingUrl(latitude, longitude)
           );
           
           if (response.ok) {
@@ -606,6 +608,9 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
               </div>
 
               {/* Botões */}
+              {/* Aviso de Privacidade */}
+              <PrivacyNotice />
+              
               <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
                 <motion.button
                   type="button"

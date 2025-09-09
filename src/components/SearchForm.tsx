@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Search, User } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Checkbox } from './ui/checkbox';
 import { SearchFilters } from '@/types/person';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface SearchFormProps {
   onSearch: (filters: SearchFilters) => void;
@@ -21,6 +22,23 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
     sexos: [],
     status: []
   });
+
+  // Debounce dos filtros para busca automática
+  const debouncedFilters = useDebounce(filters, 400);
+
+  // Busca automática quando os filtros mudam (com debounce)
+  useEffect(() => {
+    // Só faz busca automática se pelo menos um filtro estiver preenchido
+    const hasFilters = debouncedFilters.nome || 
+                      debouncedFilters.idadeMinima || 
+                      debouncedFilters.idadeMaxima || 
+                      debouncedFilters.sexos.length > 0 || 
+                      debouncedFilters.status.length > 0;
+    
+    if (hasFilters) {
+      onSearch(debouncedFilters);
+    }
+  }, [debouncedFilters, onSearch]);
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();

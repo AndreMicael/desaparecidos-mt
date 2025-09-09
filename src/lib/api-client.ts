@@ -3,6 +3,7 @@
  */
 
 import { config } from './config';
+import { sanitizeError, createUserFriendlyError } from './error-handler';
 
 export class ApiError extends Error {
   public status?: number;
@@ -106,7 +107,12 @@ class ApiClient {
 
         // Não fazer retry na última tentativa
         if (attempt === retries) {
-          throw error;
+          const safeError = sanitizeError(error);
+          throw new ApiError(
+            createUserFriendlyError(error),
+            safeError.status,
+            safeError.code
+          );
         }
 
         // Aguardar antes da próxima tentativa
@@ -161,10 +167,14 @@ class ApiClient {
           if (error.name === 'AbortError') {
             throw new ApiError('Requisição cancelada ou tempo limite excedido.', undefined, 'TIMEOUT');
           }
-
-          if (error.message.includes('fetch')) {
-            throw new ApiError('Erro de conexão. Verifique sua internet e tente novamente.', undefined, 'NETWORK_ERROR');
-          }
+          
+          // Sanitizar erro antes de lançar
+          const safeError = sanitizeError(error);
+          throw new ApiError(
+            createUserFriendlyError(error),
+            safeError.status,
+            safeError.code
+          );
         }
 
         throw new ApiError('Erro inesperado. Tente novamente.', undefined, 'UNKNOWN_ERROR');
@@ -216,10 +226,14 @@ class ApiClient {
           if (error.name === 'AbortError') {
             throw new ApiError('Requisição cancelada ou tempo limite excedido.', undefined, 'TIMEOUT');
           }
-
-          if (error.message.includes('fetch')) {
-            throw new ApiError('Erro de conexão. Verifique sua internet e tente novamente.', undefined, 'NETWORK_ERROR');
-          }
+          
+          // Sanitizar erro antes de lançar
+          const safeError = sanitizeError(error);
+          throw new ApiError(
+            createUserFriendlyError(error),
+            safeError.status,
+            safeError.code
+          );
         }
 
         throw new ApiError('Erro inesperado. Tente novamente.', undefined, 'UNKNOWN_ERROR');
@@ -268,10 +282,14 @@ class ApiClient {
           if (error.name === 'AbortError') {
             throw new ApiError('Requisição cancelada ou tempo limite excedido.', undefined, 'TIMEOUT');
           }
-
-          if (error.message.includes('fetch')) {
-            throw new ApiError('Erro de conexão. Verifique sua internet e tente novamente.', undefined, 'NETWORK_ERROR');
-          }
+          
+          // Sanitizar erro antes de lançar
+          const safeError = sanitizeError(error);
+          throw new ApiError(
+            createUserFriendlyError(error),
+            safeError.status,
+            safeError.code
+          );
         }
 
         throw new ApiError('Erro inesperado. Tente novamente.', undefined, 'UNKNOWN_ERROR');

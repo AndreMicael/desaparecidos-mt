@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Loader2, ArrowLeft, Phone, Mail, MapPin, Calendar, FileImage, Eye, EyeOff, User, Clock, MessageSquare } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { PersonPhoto } from '@/components/ui/optimized-image';
 import { PosterGenerator } from '@/components/PosterGenerator';
 import { InformationForm } from '@/components/InformationForm';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -271,20 +271,12 @@ export default function DesaparecidoPage() {
                     whileHover={{ scale: 1.01 }}
                     transition={{ duration: 0.15 }}
                   >
-                    <ImageWithFallback
+                    <PersonPhoto
                       src={person.foto}
                       alt={person.nome}
-                      className="w-full h-full object-cover"
-                      containerClassName="w-full h-full"
-                      placeholder={
-                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                          <img 
-                            src="/sem-foto.svg" 
-                            alt="Sem foto disponível"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      }
+                      size="lg"
+                      className="w-full h-full"
+                      priority={true}
                     />
                   </motion.div>
                 </motion.div>

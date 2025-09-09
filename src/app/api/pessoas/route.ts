@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const url = `https://abitus-api.geia.vip/v1/pessoas/aberto/filtro?${urlParams.toString()}`;
+    const url = `${process.env.NEXT_PUBLIC_ABITUS_API_URL || 'https://abitus-api.geia.vip/v1'}/pessoas/aberto/filtro?${urlParams.toString()}`;
     console.log('URL da API externa:', url);
     
     const response = await fetch(url, {

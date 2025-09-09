@@ -11,7 +11,7 @@ import { SearchFilters } from '@/types/person';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/ui/pagination';
 import { PeopleListSkeleton, PeopleEmptyState, PeopleErrorState } from '@/components/ui/network-states';
-import { useApiCache } from '@/hooks/useApi';
+import { useMemoizedFetch } from '@/hooks/useMemoizedFetch';
 import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
 
@@ -44,14 +44,17 @@ function HomePageContent() {
     data: personsData, 
     loading, 
     error, 
-    revalidate 
-  } = useApiCache<{ persons: Person[]; totalPages: number }>(
+    refetch: revalidate,
+    isCached,
+    isStale
+  } = useMemoizedFetch<{ persons: Person[]; totalPages: number }>(
     `persons-page-${currentPage}-size-${pageSize}`,
     () => loadPersons(currentPage),
     {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      dedupingInterval: 5000, // 5 segundos
+      cacheTime: 5 * 60 * 1000, // 5 minutos
+      staleTime: 1 * 60 * 1000, // 1 minuto
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
     }
   );
 

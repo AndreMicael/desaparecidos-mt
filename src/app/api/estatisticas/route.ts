@@ -9,7 +9,7 @@ interface Statistics {
 export async function GET() {
   try {
     // Buscar total de pessoas (todas)
-    const totalUrl = 'https://abitus-api.geia.vip/v1/pessoas/aberto/filtro?pagina=0&porPagina=1';
+    const totalUrl = `${process.env.NEXT_PUBLIC_ABITUS_API_URL || 'https://abitus-api.geia.vip/v1'}/pessoas/aberto/filtro?pagina=0&porPagina=1`;
     const totalResponse = await fetch(totalUrl, {
       method: 'GET',
       headers: {
@@ -25,7 +25,7 @@ export async function GET() {
     const totalElements = totalData.totalElements;
 
     // Buscar pessoas localizadas usando o parâmetro status=LOCALIZADO
-    const localizadasUrl = 'https://abitus-api.geia.vip/v1/pessoas/aberto/filtro?pagina=0&porPagina=1&status=LOCALIZADO';
+    const localizadasUrl = `${process.env.NEXT_PUBLIC_ABITUS_API_URL || 'https://abitus-api.geia.vip/v1'}/pessoas/aberto/filtro?pagina=0&porPagina=1&status=LOCALIZADO`;
     const localizadasResponse = await fetch(localizadasUrl, {
       method: 'GET',
       headers: {

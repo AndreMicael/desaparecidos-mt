@@ -3,7 +3,7 @@
 import { User } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { ImageWithFallback } from './ui/image-with-fallback';
+import { PersonPhoto } from './ui/optimized-image';
 import { Person } from '@/types/person';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -84,20 +84,11 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
               transition={{ duration: 0.15 }}
               className="w-full h-full"
             >
-              <ImageWithFallback
+              <PersonPhoto
                 src={person.foto}
                 alt={`Foto de ${person.nome}`}
+                size="md"
                 className="w-full h-full object-cover"
-                containerClassName="w-full h-full"
-                placeholder={
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                    <img 
-                      src="/sem-foto.svg" 
-                      alt="Sem foto disponível"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                }
               />
             </motion.div>
             {/* Status badge overlay */}

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, Search, Filter, Eye, Calendar, MapPin, User, Phone, Mail, FileText, Image as ImageIcon, ExternalLink, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Modal } from '@/components/ui/modal';
+import { PersonPhoto, GridImage } from '@/components/ui/optimized-image';
 
 interface Information {
   id: string;
@@ -308,14 +309,11 @@ export default function AdminDashboard() {
                      {/* Foto do desaparecido */}
                      <div className="flex-shrink-0">
                        <div className="w-20 h-20 rounded-lg overflow-hidden border-2 border-gray-200">
-                         <img
+                         <PersonPhoto
                            src={getPersonPhoto(info.personId)}
                            alt={getPersonName(info.personId)}
-                           className="w-full h-full object-cover"
-                           onError={(e) => {
-                             const target = e.target as HTMLImageElement;
-                             target.src = '/sem-foto.svg';
-                           }}
+                           size="sm"
+                           className="w-full h-full"
                          />
                        </div>
                      </div>
@@ -451,20 +449,10 @@ export default function AdminDashboard() {
                        onClick={() => setSelectedImage({ url: photoUrl.trim(), index, total: photoUrls.length })}
                           >
                             <div className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 hover:border-yellow-400 transition-colors bg-gray-100 shadow-md hover:shadow-lg">
-                              <img
+                              <GridImage
                                 src={photoUrl.trim()}
                                 alt={`Anexo ${index + 1}`}
-                                className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  console.error('Erro ao carregar imagem:', photoUrl.trim());
-                                  target.src = '/sem-foto.svg';
-                                  target.alt = 'Erro ao carregar imagem';
-                                }}
-                                onLoad={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  console.log('Imagem carregada com sucesso:', photoUrl.trim());
-                                }}
+                                className="w-full h-full transition-transform duration-200 hover:scale-105"
                               />
                             </div>
                             {/* Indicador sutil de que é clicável */}

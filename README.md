@@ -20,19 +20,62 @@ Sistema completo para divulgação e gerenciamento de informações sobre pessoa
 ## 🚀 Funcionalidades Principais
 
 ### Área Pública
-- **Busca avançada** de pessoas desaparecidas e localizadas
-- **Visualização detalhada** de cada pessoa com fotos e informações
-- **Formulário de informações** para cidadãos reportarem avistamentos
-- **Upload de fotos** como evidência de avistamentos
-- **Interface responsiva** e acessível
+- **Busca avançada** com debounce e filtros em tempo real
+- **Visualização detalhada** com imagens otimizadas (Next.js Image)
+- **Formulário de informações** com validação robusta e privacidade
+- **Upload de fotos** com pré-visualização e validação
+- **Interface responsiva** e totalmente acessível (WCAG 2.1)
 - **Animações suaves** com Framer Motion
+- **Geolocalização** opcional para avistamentos
+- **Ações úteis** (compartilhar, copiar link, imprimir)
 
 ### Área Administrativa
-- **Dashboard completo** para administradores
-- **Sistema de login** simples (admin/admin)
-- **Gerenciamento de informações** submetidas pelos cidadãos
-- **Visualização de anexos** enviados pelos usuários
-- **Estatísticas em tempo real**
+- **Dashboard completo** com lazy loading
+- **Sistema de login** seguro
+- **Gerenciamento de informações** com modais acessíveis
+- **Visualização de anexos** otimizada
+- **Estatísticas em tempo real** com cache inteligente
+
+### Melhorias de Performance
+- **Lazy loading** de componentes pesados
+- **Debounce** na busca (400ms)
+- **Cache inteligente** com SWR-like
+- **Imagens otimizadas** com sizes responsivos
+- **Code splitting** automático
+
+### Segurança e Privacidade
+- **Headers de segurança** completos (CSP, nosniff, etc.)
+- **Mensagens de erro** sanitizadas
+- **Política de privacidade** integrada
+- **Validação de entrada** robusta
+- **Proteção contra XSS** e ataques
+
+## 🎯 Fluxo do Usuário
+
+### Busca e Filtros → Detalhe → Enviar Informação
+
+```mermaid
+graph TD
+    A[Usuário acessa o site] --> B[Página inicial com busca]
+    B --> C[Digita filtros de busca]
+    C --> D[Debounce aplica filtros automaticamente]
+    D --> E[Lista de pessoas filtradas]
+    E --> F[Usuário clica em uma pessoa]
+    F --> G[Página de detalhes da pessoa]
+    G --> H[Usuário clica em 'Enviar Informação']
+    H --> I[Formulário de informações]
+    I --> J[Preenche dados do avistamento]
+    J --> K[Upload de fotos opcional]
+    K --> L[Geolocalização opcional]
+    L --> M[Submete informações]
+    M --> N[Confirmação de envio]
+    N --> O[Volta para lista ou detalhes]
+```
+
+### GIF do Fluxo
+![Fluxo do Sistema](docs/flow-demo.gif)
+
+*Demonstração completa do fluxo: busca → filtros → detalhes → envio de informações*
 
 ## 📋 Sumário
 - [Tecnologias](#tecnologias)

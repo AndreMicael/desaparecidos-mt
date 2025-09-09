@@ -31,8 +31,9 @@ const Toaster = dynamic(() => import('@/components/ui/sonner').then(mod => ({ de
 function HomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [totalPessoas, setTotalPessoas] = useState(449);
-  const [pessoasLocalizadas, setPessoasLocalizadas] = useState(23);
+  const [totalPessoas, setTotalPessoas] = useState(0);
+  const [pessoasLocalizadas, setPessoasLocalizadas] = useState(0);
+  const [loadingStats, setLoadingStats] = useState(true);
   
   const { currentPage, pageSize, setPage, setPageSize, updateUrl } = usePagination({
     defaultPageSize: 12,
@@ -61,6 +62,31 @@ function HomePageContent() {
   const persons = personsData?.persons || [];
   const totalPages = personsData?.totalPages || 1;
 
+  // Função para carregar estatísticas globais
+  const loadStatistics = async () => {
+    try {
+      setLoadingStats(true);
+      const response = await fetch('/api/estatisticas');
+      if (response.ok) {
+        const stats = await response.json();
+        setTotalPessoas(stats.total);
+        setPessoasLocalizadas(stats.localizadas);
+        console.log('Estatísticas carregadas:', stats);
+      } else {
+        console.error('Erro ao carregar estatísticas:', response.status);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar estatísticas:', error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  // Carregar estatísticas ao montar o componente
+  useEffect(() => {
+    loadStatistics();
+  }, []);
+
   const loadPersons = async (page: number = 1, filters?: SearchFilters): Promise<{ persons: Person[]; totalPages: number }> => {
     const urlParams = new URLSearchParams({
       page: page.toString(),
@@ -88,11 +114,6 @@ function HomePageContent() {
 
     const result = await response.json();
     const totalPages = Math.ceil(result.total / pageSize);
-    
-    // Atualizar estatísticas globais
-    setTotalPessoas(result.total);
-    const localizadas = result.data.filter((p: Person) => p.localizado).length;
-    setPessoasLocalizadas(localizadas);
     
     return {
       persons: result.data,
@@ -150,10 +171,11 @@ function HomePageContent() {
     >
       {/* Hero Section with integrated search */}
       <HeroSection 
-        totalPessoas={totalPessoas}
-        pessoasLocalizadas={pessoasLocalizadas}
+        totalPessoas={loadingStats ? 0 : totalPessoas}
+        pessoasLocalizadas={loadingStats ? 0 : pessoasLocalizadas}
         onSearch={handleSearch}
         onClear={handleClear}
+        loadingStats={loadingStats}
       />
 
       {/* Results Section - Fundo Branco */}

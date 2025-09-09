@@ -10,13 +10,15 @@ interface HeroSectionProps {
   pessoasLocalizadas?: number;
   onSearch: (filters: SearchFilters) => void;
   onClear: () => void;
+  loadingStats?: boolean;
 }
 
 export function HeroSection({ 
-  totalPessoas = 449, 
-  pessoasLocalizadas = 23, 
+  totalPessoas = 0, 
+  pessoasLocalizadas = 0, 
   onSearch, 
-  onClear 
+  onClear,
+  loadingStats = false
 }: HeroSectionProps) {
   return (
     <div className="relative min-h-[400px] md:min-h-[500px] lg:min-h-[600px] font-encode-sans overflow-hidden">
@@ -92,9 +94,13 @@ export function HeroSection({
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.3, delay: 0.5, type: "spring", stiffness: 200 }}
                 >
-                  {totalPessoas}
+                  {loadingStats ? (
+                    <div className="w-8 h-6 bg-white/20 rounded animate-pulse mx-auto"></div>
+                  ) : (
+                    totalPessoas.toLocaleString('pt-BR')
+                  )}
                 </motion.div>
-                <div className="text-xs text-gray-300 text-white">PESSOAS CADASTRADAS</div>
+                <div className="text-xs text-gray-300">PESSOAS CADASTRADAS</div>
               </motion.div>
 
               {/* Pessoas Localizadas */}
@@ -118,9 +124,13 @@ export function HeroSection({
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.3, delay: 0.6, type: "spring", stiffness: 200 }}
                 >
-                  {pessoasLocalizadas}
+                  {loadingStats ? (
+                    <div className="w-8 h-6 bg-white/20 rounded animate-pulse mx-auto"></div>
+                  ) : (
+                    pessoasLocalizadas.toLocaleString('pt-BR')
+                  )}
                 </motion.div>
-                <div className="text-xs text-gray-300 text-white">PESSOAS LOCALIZADAS</div>
+                <div className="text-xs text-gray-300">PESSOAS LOCALIZADAS</div>
               </motion.div>
             </motion.div>
           </div>

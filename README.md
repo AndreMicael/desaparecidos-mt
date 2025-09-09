@@ -11,7 +11,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AndreMicael)
 [![Portfolio](https://img.shields.io/badge/Portfolio-FF5722?style=for-the-badge&logo=firefox&logoColor=white)](https://andremicael.com)
 
-**📧 Email**: [contato@andremicael.dev](mailto:andremicael@gmail.com)  
+**📧 Email**: [andremicael@gmail.com](mailto:andremicael@gmail.com)  
 **🌐 Site**: [andremicael.com](https://andremicael.com)  
 **💼 LinkedIn**: [linkedin.com/in/andremsampaio](https://www.linkedin.com/in/andremsampaio/)  
 **💻 GitHub**: [github.com/AndreMicael](https://github.com/AndreMicael)

@@ -5,7 +5,7 @@ export const PersonSchema = z.object({
   id: z.number(),
   nome: z.string().min(1, 'Nome é obrigatório'),
   idade: z.number().min(0).max(120, 'Idade deve estar entre 0 e 120 anos'),
-  sexo: z.enum(['M', 'F'], { errorMap: () => ({ message: 'Sexo deve ser M ou F' }) }),
+  sexo: z.enum(['M', 'F'], { message: 'Sexo deve ser M ou F' }),
   localizado: z.boolean(),
   dataDesaparecimento: z.string().optional(),
   localDesaparecimento: z.string().optional(),
@@ -41,7 +41,7 @@ export const SearchFiltersSchema = z.object({
 export const InformationFormSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),
   idade: z.string().min(1, 'Idade é obrigatória'),
-  sexo: z.enum(['M', 'F'], { errorMap: () => ({ message: 'Sexo é obrigatório' }) }),
+  sexo: z.enum(['M', 'F'], { message: 'Sexo é obrigatório' }),
   dataDesaparecimento: z.string().min(1, 'Data de desaparecimento é obrigatória'),
   localDesaparecimento: z.string().min(1, 'Local de desaparecimento é obrigatório'),
   descricao: z.string().min(1, 'Descrição é obrigatória'),

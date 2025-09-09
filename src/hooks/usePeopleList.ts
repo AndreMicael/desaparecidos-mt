@@ -49,7 +49,13 @@ interface UsePeopleListReturn {
 
 export function usePeopleList(options: UsePeopleListOptions = {}): UsePeopleListReturn {
   const {
-    initialFilters = {},
+    initialFilters = {
+      nome: '',
+      idadeMinima: '',
+      idadeMaxima: '',
+      sexos: [],
+      status: []
+    },
     pageSize: initialPageSize = 12,
     autoSearch = true,
     debounceMs = 400,

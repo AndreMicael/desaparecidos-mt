@@ -272,7 +272,7 @@ export function UsefulActions({ person, className = "" }: UsefulActionsProps) {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        {navigator.share 
+        {typeof navigator !== 'undefined' && 'share' in navigator
           ? 'Compartilhamento nativo disponível no seu dispositivo' 
           : 'Compartilhamento via cópia de link'
         }

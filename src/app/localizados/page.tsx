@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { Person } from '@/types/person';
 import { toast } from 'sonner';
@@ -23,7 +23,7 @@ const PersonCardGridSkeleton = dynamic(() => import('@/components/PersonCardGrid
   ssr: false
 });
 
-export default function LocalizadosPage() {
+function LocalizadosPageContent() {
   const router = useRouter();
   const resultsRef = useRef<HTMLDivElement>(null);
   const [persons, setPersons] = useState<Person[]>([]);
@@ -218,5 +218,20 @@ export default function LocalizadosPage() {
         </div>
       </motion.div>
     </motion.div>
+  );
+}
+
+export default function LocalizadosPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-yellow-400" />
+          <p className="text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    }>
+      <LocalizadosPageContent />
+    </Suspense>
   );
 }

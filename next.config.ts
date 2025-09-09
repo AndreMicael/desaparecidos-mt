@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Remover output: 'standalone' para compatibilidade com Vercel
-  // output: 'standalone', // Usado apenas para Docker
+  // Configuração para Docker
+  output: 'standalone',
   // Configuração para resolver warning de múltiplos lockfiles
   outputFileTracingRoot: process.cwd(),
   

@@ -5,6 +5,7 @@ import { Phone, Mail, MapPin, Clock, Send, AlertTriangle } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { usePhoneMask } from '@/lib/masks';
 
 // Lazy loading dos componentes
 const Button = dynamic(() => import('@/components/ui/button').then(mod => ({ default: mod.Button })), {
@@ -25,6 +26,7 @@ export default function ContatoPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const { handlePhoneChange } = usePhoneMask();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,10 +47,21 @@ export default function ContatoPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    const { name, value } = e.target;
+    
+    if (name === 'telefone') {
+      handlePhoneChange(value, (formattedValue) => {
+        setFormData(prev => ({
+          ...prev,
+          [name]: formattedValue
+        }));
+      });
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   return (
@@ -231,7 +244,7 @@ export default function ContatoPage() {
                       required
                       value={formData.nome}
                       onChange={handleChange}
-                      className="w-full"
+                      className="w-full bg-white text-black border-gray-300 focus:ring-yellow-400 focus:border-yellow-400"
                       placeholder="Seu nome completo"
                     />
                   </motion.div>
@@ -250,7 +263,7 @@ export default function ContatoPage() {
                       required
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full"
+                      className="w-full bg-white text-black border-gray-300 focus:ring-yellow-400 focus:border-yellow-400"
                       placeholder="seu@email.com"
                     />
                   </motion.div>
@@ -271,7 +284,7 @@ export default function ContatoPage() {
                     type="tel"
                     value={formData.telefone}
                     onChange={handleChange}
-                    className="w-full"
+                    className="w-full bg-white text-black border-gray-300 focus:ring-yellow-400 focus:border-yellow-400"
                     placeholder="(65) 99999-9999"
                   />
                 </motion.div>
@@ -292,7 +305,7 @@ export default function ContatoPage() {
                     required
                     value={formData.assunto}
                     onChange={handleChange}
-                    className="w-full"
+                    className="w-full bg-white text-black border-gray-300 focus:ring-yellow-400 focus:border-yellow-400"
                     placeholder="Assunto da mensagem"
                   />
                 </motion.div>
@@ -313,7 +326,7 @@ export default function ContatoPage() {
                     value={formData.mensagem}
                     onChange={handleChange}
                     rows={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent bg-white text-black"
                     placeholder="Digite sua mensagem..."
                   />
                 </motion.div>

@@ -1,11 +1,4 @@
 import '@testing-library/jest-dom';
-import 'whatwg-fetch';
-import { server } from './src/__tests__/mocks/server';
-
-// Configurar MSW para testes
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
 
 // Mock do navigator.geolocation
 Object.defineProperty(navigator, 'geolocation', {

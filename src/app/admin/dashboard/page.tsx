@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, Search, Filter, Eye, Calendar, MapPin, User, Phone, Mail, FileText, Image as ImageIcon, ExternalLink, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
+import { Modal } from '@/components/ui/modal';
 
 interface Information {
   id: string;
@@ -400,47 +401,17 @@ export default function AdminDashboard() {
       </div>
 
        {/* Modal de Fotos */}
-       <AnimatePresence>
-         {showPhotoModal && (
-           <motion.div
-             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             exit={{ opacity: 0 }}
-             onClick={() => setShowPhotoModal(null)}
-           >
-             <motion.div
-               className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-               initial={{ scale: 0.9, opacity: 0 }}
-               animate={{ scale: 1, opacity: 1 }}
-               exit={{ scale: 0.9, opacity: 0 }}
-               onClick={(e) => e.stopPropagation()}
-             >
-                               <div className="p-6 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        Fotos Anexadas
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Clique em qualquer foto para visualizar em tamanho completo
-                      </p>
-                    </div>
-                    <motion.button
-                      onClick={() => setShowPhotoModal(null)}
-                      className="text-gray-400 hover:text-gray-600 transition-colors"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </motion.button>
-                  </div>
-                </div>
-               
-               <div className="p-6">
-                 {(() => {
+       <Modal
+         isOpen={!!showPhotoModal}
+         onClose={() => setShowPhotoModal(null)}
+         title="Fotos Anexadas"
+         size="xl"
+       >
+         <div className="space-y-4">
+           <p className="text-sm text-gray-600 mb-4">
+             Clique em qualquer foto para visualizar em tamanho completo
+           </p>
+           {(() => {
                    const info = informations.find(i => i.id === showPhotoModal);
                    if (!info || !info.photos) {
                      return (
@@ -511,12 +482,9 @@ export default function AdminDashboard() {
                                                </div>
                        </div>
                      );
-                   })()}
-                 </div>
-               </motion.div>
-             </motion.div>
-           )}
-                 </AnimatePresence>
+           })()}
+         </div>
+       </Modal>
 
         {/* Modal de Imagem Ampliada */}
         <AnimatePresence>

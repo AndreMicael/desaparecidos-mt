@@ -150,23 +150,85 @@ export function PeopleLoadingState() {
 
 export function PeopleEmptyState({ onRetry }: { onRetry?: () => void }) {
   return (
-    <EmptyState
-      title="Nenhuma pessoa encontrada"
-      message="Não há pessoas desaparecidas ou localizadas para exibir no momento."
-      icon={<Users className="w-8 h-8 text-gray-400" />}
-      action={onRetry ? { label: "Atualizar", onClick: onRetry } : undefined}
-    />
+    <motion.div 
+      className="flex flex-col items-center justify-center py-12 text-center"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      data-testid="people-empty-state"
+    >
+      <motion.div
+        className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4"
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Users className="w-8 h-8 text-gray-400" />
+      </motion.div>
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">Nenhuma pessoa encontrada</h3>
+      <p className="text-gray-600 mb-6 max-w-md">Não há pessoas desaparecidas ou localizadas para exibir no momento.</p>
+      {onRetry && (
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button
+            onClick={onRetry}
+            className="bg-yellow-400 text-white hover:bg-yellow-500"
+          >
+            Atualizar
+          </Button>
+        </motion.div>
+      )}
+    </motion.div>
   );
 }
 
 export function PeopleErrorState({ onRetry, error }: { onRetry?: () => void; error?: any }) {
+  const isNetworkError = error?.code === 'NETWORK_ERROR' || error?.code === 'TIMEOUT';
+  const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+
   return (
-    <ErrorState
-      title="Erro ao carregar pessoas"
-      message="Não foi possível carregar a lista de pessoas. Verifique sua conexão e tente novamente."
-      onRetry={onRetry}
-      error={error}
-    />
+    <motion.div 
+      className="flex flex-col items-center justify-center py-12 text-center"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      data-testid="people-error-state"
+    >
+      <motion.div
+        className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4"
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.2 }}
+      >
+        {isOffline ? (
+          <WifiOff className="w-8 h-8 text-red-500" data-testid="offline-icon" />
+        ) : isNetworkError ? (
+          <Wifi className="w-8 h-8 text-red-500" data-testid="network-error-icon" />
+        ) : (
+          <AlertCircle className="w-8 h-8 text-red-500" />
+        )}
+      </motion.div>
+      
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        {isOffline ? "Sem conexão com a internet" : "Erro ao carregar pessoas"}
+      </h3>
+      
+      <p className="text-gray-600 mb-6 max-w-md">
+        {isOffline 
+          ? "Verifique sua conexão com a internet e tente novamente."
+          : error?.message || "Não foi possível carregar a lista de pessoas. Verifique sua conexão e tente novamente."
+        }
+      </p>
+      
+      {onRetry && (
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button
+            onClick={onRetry}
+            className="flex items-center gap-2 bg-red-500 text-white hover:bg-red-600"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Tentar Novamente
+          </Button>
+        </motion.div>
+      )}
+    </motion.div>
   );
 }
 
@@ -181,6 +243,7 @@ export function PeopleListSkeleton({ count = 8 }: { count?: number }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: index * 0.1 }}
+          data-testid="skeleton-card"
         >
           {/* Skeleton da foto */}
           <div className="h-48 bg-gray-200 animate-pulse" />
@@ -201,20 +264,20 @@ export function PeopleListSkeleton({ count = 8 }: { count?: number }) {
 // Skeleton para detalhes de pessoa
 export function PersonDetailSkeleton() {
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto" data-testid="person-detail-skeleton">
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         {/* Skeleton da foto principal */}
-        <div className="h-64 bg-gray-200 animate-pulse" />
+        <div className="h-64 bg-gray-200 animate-pulse" data-testid="photo-skeleton" />
         
         <div className="p-6 space-y-6">
           {/* Skeleton do título */}
-          <div className="space-y-2">
+          <div className="space-y-2" data-testid="title-skeleton">
             <div className="h-8 bg-gray-200 rounded animate-pulse w-1/2" />
             <div className="h-4 bg-gray-200 rounded animate-pulse w-1/3" />
           </div>
           
           {/* Skeleton das informações */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6" data-testid="info-skeleton">
             {Array.from({ length: 6 }).map((_, index) => (
               <div key={index} className="space-y-2">
                 <div className="h-3 bg-gray-200 rounded animate-pulse w-1/4" />
@@ -224,7 +287,7 @@ export function PersonDetailSkeleton() {
           </div>
           
           {/* Skeleton das ações */}
-          <div className="flex gap-4">
+          <div className="flex gap-4" data-testid="actions-skeleton">
             {Array.from({ length: 3 }).map((_, index) => (
               <div key={index} className="h-10 bg-gray-200 rounded animate-pulse w-24" />
             ))}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Encode_Sans } from "next/font/google";
 import "./globals.css";
 import dynamic from "next/dynamic";
+import { SkipToContent } from "@/components/SkipToContent";
 
 // Lazy loading dos componentes do layout
 const Header = dynamic(() => import("@/components/Header").then(mod => ({ default: mod.Header })), {
@@ -57,8 +58,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${encodeSans.variable} font-sans`}>
+        <SkipToContent />
         <Header />
-        {children}
+        <main id="main-content" tabIndex={-1}>
+          {children}
+        </main>
         <Footer />
       </body>
     </html>

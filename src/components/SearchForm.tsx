@@ -74,49 +74,68 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
             <div className="space-y-1 sm:space-y-2">
               <div className="flex items-center gap-2 text-white">
                 <User className="w-3 h-3" />
-                <label className="text-xs sm:text-sm text-white">Nome</label>
+                <label htmlFor="search-nome" className="text-xs sm:text-sm text-white">Nome</label>
               </div>
-                             <Input
-                 value={filters.nome}
-                 onChange={(e) => setFilters(prev => ({ ...prev, nome: e.target.value }))}
-                 className="bg-black/30 border-white/30 text-white placeholder-gray-300 text-xs sm:text-sm h-8 sm:h-9 focus:border-yellow-400"
-                 placeholder="Nome"
-               />
+              <Input
+                id="search-nome"
+                value={filters.nome}
+                onChange={(e) => setFilters(prev => ({ ...prev, nome: e.target.value }))}
+                className="bg-black/30 border-white/30 text-white placeholder-gray-300 text-xs sm:text-sm h-8 sm:h-9 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
+                placeholder="Digite o nome da pessoa"
+                aria-describedby="search-nome-help"
+              />
+              <p id="search-nome-help" className="sr-only">Digite o nome completo ou parcial da pessoa que você está procurando</p>
             </div>
 
             {/* Faixa Etária */}
-            <div className="space-y-1 sm:space-y-2">
-              <label className="text-xs sm:text-sm text-white">Faixa Etária:</label>
+            <fieldset className="space-y-1 sm:space-y-2">
+              <legend className="text-xs sm:text-sm text-white">Faixa Etária:</legend>
               <div className="grid grid-cols-2 gap-2">
-                                 <Input
-                   type="number"
-                   value={filters.idadeMinima}
-                   onChange={(e) => setFilters(prev => ({ ...prev, idadeMinima: e.target.value }))}
-                   className="bg-black/30 border-white/30 text-white placeholder-gray-300 text-xs sm:text-sm h-8 sm:h-9 focus:border-yellow-400"
-                   placeholder="Idade mínima"
-                 />
-                 <Input
-                   type="number"
-                   value={filters.idadeMaxima}
-                   onChange={(e) => setFilters(prev => ({ ...prev, idadeMaxima: e.target.value }))}
-                   className="bg-black/30 border-white/30 text-white placeholder-gray-300 text-xs sm:text-sm h-8 sm:h-9 focus:border-yellow-400"
-                   placeholder="Idade máxima"
-                 />
+                <div>
+                  <label htmlFor="search-idade-min" className="sr-only">Idade mínima</label>
+                  <Input
+                    id="search-idade-min"
+                    type="number"
+                    value={filters.idadeMinima}
+                    onChange={(e) => setFilters(prev => ({ ...prev, idadeMinima: e.target.value }))}
+                    className="bg-black/30 border-white/30 text-white placeholder-gray-300 text-xs sm:text-sm h-8 sm:h-9 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
+                    placeholder="Idade mínima"
+                    min="0"
+                    max="120"
+                    aria-describedby="search-idade-help"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="search-idade-max" className="sr-only">Idade máxima</label>
+                  <Input
+                    id="search-idade-max"
+                    type="number"
+                    value={filters.idadeMaxima}
+                    onChange={(e) => setFilters(prev => ({ ...prev, idadeMaxima: e.target.value }))}
+                    className="bg-black/30 border-white/30 text-white placeholder-gray-300 text-xs sm:text-sm h-8 sm:h-9 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
+                    placeholder="Idade máxima"
+                    min="0"
+                    max="120"
+                    aria-describedby="search-idade-help"
+                  />
+                </div>
               </div>
-            </div>
+              <p id="search-idade-help" className="sr-only">Digite a faixa etária desejada (0 a 120 anos)</p>
+            </fieldset>
 
             {/* Sexo e Status side by side */}
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {/* Sexo */}
-              <div className="space-y-1 sm:space-y-2">
-                <label className="text-xs sm:text-sm text-white">Sexo:</label>
+              <fieldset className="space-y-1 sm:space-y-2">
+                <legend className="text-xs sm:text-sm text-white">Sexo:</legend>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id="masculino-compact"
                       checked={filters.sexos.includes('masculino')}
                       onCheckedChange={() => toggleSexo('masculino')}
-                      className="border-white/40 data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
+                      className="border-white/40 data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4 focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
+                      aria-describedby="search-sexo-help"
                     />
                     <label htmlFor="masculino-compact" className="text-white cursor-pointer text-xs">
                       Masculino
@@ -127,25 +146,28 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
                       id="feminino-compact"
                       checked={filters.sexos.includes('feminino')}
                       onCheckedChange={() => toggleSexo('feminino')}
-                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
+                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4 focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
+                      aria-describedby="search-sexo-help"
                     />
                     <label htmlFor="feminino-compact" className="text-white cursor-pointer text-xs">
                       Feminino
                     </label>
                   </div>
                 </div>
-              </div>
+                <p id="search-sexo-help" className="sr-only">Selecione o sexo da pessoa que você está procurando</p>
+              </fieldset>
 
               {/* Status */}
-              <div className="space-y-1 sm:space-y-2">
-                <label className="text-xs sm:text-sm text-white">Status:</label>
+              <fieldset className="space-y-1 sm:space-y-2">
+                <legend className="text-xs sm:text-sm text-white">Status:</legend>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id="desaparecido-compact"
                       checked={filters.status.includes('desaparecido')}
                       onCheckedChange={() => toggleStatus('desaparecido')}
-                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
+                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4 focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
+                      aria-describedby="search-status-help"
                     />
                     <label htmlFor="desaparecido-compact" className="text-white cursor-pointer text-xs">
                       Desaparecido
@@ -156,21 +178,24 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
                       id="localizado-compact"
                       checked={filters.status.includes('localizado')}
                       onCheckedChange={() => toggleStatus('localizado')}
-                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4"
+                      className="border-white/40  data-[state=checked]:text-black data-[state=checked]:bg-white data-[state=checked]:border-yellow-400 w-3 h-3 sm:w-4 sm:h-4 focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
+                      aria-describedby="search-status-help"
                     />
                     <label htmlFor="localizado-compact" className="text-white cursor-pointer text-xs">
                       Localizado
                     </label>
                   </div>
                 </div>
-              </div>
+                <p id="search-status-help" className="sr-only">Selecione o status da pessoa que você está procurando</p>
+              </fieldset>
             </div>
 
             {/* Buttons */}
             <div className="flex flex-col gap-2 pt-2">
               <Button
                 type="submit"
-                className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold text-xs sm:text-sm h-8 sm:h-9 w-full"
+                className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold text-xs sm:text-sm h-8 sm:h-9 w-full focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-black/50 focus:outline-none"
+                aria-label="Buscar pessoas com os filtros selecionados"
               >
                 <Search className="w-3 h-3 mr-2" />
                 BUSCAR
@@ -179,7 +204,8 @@ export function SearchForm({ onSearch, onClear, compact = false }: SearchFormPro
               <button
                 type="button"
                 onClick={handleClear}
-                className="text-white hover:text-yellow-400 text-xs underline text-right"
+                className="text-white hover:text-yellow-400 text-xs underline text-right focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 focus:outline-none rounded px-1 py-0.5"
+                aria-label="Limpar todos os filtros de busca"
               >
                 LIMPAR BUSCA
               </button>

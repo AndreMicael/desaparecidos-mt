@@ -234,30 +234,24 @@ export function PosterGenerator({ person, isOpen, onClose }: PosterGeneratorProp
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     {/* Foto com proporção 3x4 (retrato) */}
                     <div style={{ width: '75%', aspectRatio: '3/4', border: '2px solid #d1d5db', overflow: 'hidden', marginBottom: '12px', backgroundColor: '#e5e7eb' }}>
-                     {person.foto ? (
-                                               <img
-                          src={person.foto}
-                          alt={person.nome}
-                          style={{ 
-                            width: '100%', 
-                            height: '100%', 
-                            objectFit: 'cover',
-                            minWidth: '100%',
-                            minHeight: '100%',
-                            maxWidth: '100%',
-                            maxHeight: '100%'
-                          }}
-                          crossOrigin="anonymous"
-                         onError={(e) => {
-                           const target = e.target as HTMLImageElement;
-                           target.style.display = 'none';
-                           const sibling = target.nextElementSibling as HTMLElement;
-                           if (sibling) {
-                             sibling.style.display = 'flex';
-                           }
-                         }}
-                       />
-                     ) : null}
+                     <img
+                        src={person.foto && person.foto.trim() !== '' ? person.foto : '/sem-foto.svg'}
+                        alt={person.nome}
+                        style={{ 
+                          width: '100%', 
+                          height: '100%', 
+                          objectFit: 'cover',
+                          minWidth: '100%',
+                          minHeight: '100%',
+                          maxWidth: '100%',
+                          maxHeight: '100%'
+                        }}
+                        crossOrigin="anonymous"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/sem-foto.svg';
+                        }}
+                      />
                      <div style={{ 
                        width: '100%', 
                        height: '100%', 

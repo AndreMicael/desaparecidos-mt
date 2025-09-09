@@ -73,9 +73,8 @@ export function OptimizedImage({
         placeholder={placeholder}
         blurDataURL={blurDataURL || defaultBlurDataURL}
         className={cn(
-          'transition-opacity duration-300',
-          isLoading ? 'opacity-0' : 'opacity-100',
-          hasError ? 'object-contain' : 'object-cover'
+          'transition-opacity duration-300 object-cover w-full h-full',
+          isLoading ? 'opacity-0' : 'opacity-100'
         )}
         onLoad={handleLoad}
         onError={handleError}
@@ -129,7 +128,7 @@ export function PersonPhoto({
       height={config.height}
       sizes={config.sizes}
       priority={priority}
-      className={cn('rounded-lg object-cover', className)}
+      className={cn('rounded-lg object-cover w-full h-full', className)}
       fallbackSrc="/sem-foto.svg"
     />
   );

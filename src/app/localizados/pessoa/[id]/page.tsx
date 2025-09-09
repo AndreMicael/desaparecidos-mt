@@ -165,7 +165,7 @@ export default function LocalizadoPage() {
                 {/* Photo */}
                 <div className="w-32 h-32 bg-gray-200 rounded-lg overflow-hidden">
                   <ImageWithFallback
-                    src={person.foto}
+                    src={person.foto && person.foto.trim() !== '' ? person.foto : '/sem-foto.svg'}
                     alt={person.nome}
                     className="w-full h-full object-cover"
                     containerClassName="w-full h-full"

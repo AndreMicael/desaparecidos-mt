@@ -85,7 +85,7 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
               className="w-full h-full"
             >
               <PersonPhoto
-                src={person.foto}
+                src={person.foto && person.foto.trim() !== '' ? person.foto : '/sem-foto.svg'}
                 alt={`Foto de ${person.nome}`}
                 size="md"
                 className="w-full h-full object-cover"

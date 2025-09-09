@@ -272,10 +272,10 @@ export default function DesaparecidoPage() {
                     transition={{ duration: 0.15 }}
                   >
                     <PersonPhoto
-                      src={person.foto}
+                      src={person.foto && person.foto.trim() !== '' ? person.foto : '/sem-foto.svg'}
                       alt={person.nome}
                       size="lg"
-                      className="w-full h-full"
+                      className="w-full h-full object-cover"
                       priority={true}
                     />
                   </motion.div>

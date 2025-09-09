@@ -149,7 +149,7 @@ export default function AdminDashboard() {
 
   const getPersonPhoto = (personId: string) => {
     const person = persons.find(p => p.id.toString() === personId);
-    return person?.foto || '/sem-foto.svg';
+    return person?.foto && person.foto.trim() !== '' ? person.foto : '/sem-foto.svg';
   };
 
   const formatDate = (dateString: string) => {
@@ -308,12 +308,12 @@ export default function AdminDashboard() {
                    <div className="flex items-start gap-6">
                      {/* Foto do desaparecido */}
                      <div className="flex-shrink-0">
-                       <div className="w-20 h-20 rounded-lg overflow-hidden border-2 border-gray-200">
+                       <div className="w-20 h-20 rounded-lg overflow-hidden border-2 border-gray-200 bg-gray-100">
                          <PersonPhoto
                            src={getPersonPhoto(info.personId)}
                            alt={getPersonName(info.personId)}
                            size="sm"
-                           className="w-full h-full"
+                           className="w-full h-full object-cover"
                          />
                        </div>
                      </div>

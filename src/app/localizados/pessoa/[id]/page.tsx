@@ -7,9 +7,9 @@ import { Loader2, ArrowLeft, Phone, Mail, MapPin, Calendar, FileImage } from 'lu
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
-import { InstagramLogoIcon, WhatsappLogo } from '@phosphor-icons/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getSimpleStatusBadgeClasses } from '@/lib/status-colors';
+import { UsefulActions } from '@/components/UsefulActions';
 
 // Lazy loading dos componentes
 const Button = dynamic(() => import('@/components/ui/button').then(mod => ({ default: mod.Button })), {
@@ -64,19 +64,6 @@ export default function LocalizadoPage() {
     router.back();
   };
 
-  const handleShare = (platform: 'whatsapp' | 'instagram') => {
-    const text = `✅ PESSOA LOCALIZADA: ${person?.nome}\n📅 Desde: ${person?.dtDesaparecimento ? new Date(person.dtDesaparecimento).toLocaleDateString('pt-BR') : 'Data não informada'}\n📍 Local: ${person?.localDesaparecimentoConcat || 'Não informado'}\n\nEsta pessoa foi localizada com sucesso pela Polícia Civil de Mato Grosso!`;
-    
-    if (platform === 'whatsapp') {
-      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-      window.open(whatsappUrl, '_blank');
-    } else if (platform === 'instagram') {
-      // Para Instagram, copiamos o texto para a área de transferência
-      navigator.clipboard.writeText(text).then(() => {
-        toast.success('Texto copiado! Cole no Instagram para compartilhar.');
-      });
-    }
-  };
 
   const daysSinceDisappearance = person?.dtDesaparecimento 
     ? Math.floor((new Date().getTime() - new Date(person.dtDesaparecimento).getTime()) / (1000 * 3600 * 24))
@@ -338,44 +325,14 @@ export default function LocalizadoPage() {
                     </div>
                   </motion.div>
 
-                  {/* Compartilhar sucesso */}
+                  {/* Ações Úteis */}
                   <motion.div 
                     className="pt-4 border-t border-gray-100"
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.5, delay: 1.3 }}
                   >
-                    <h4 className="text-base font-medium text-gray-900 mb-3 text-center lg:text-left">
-                      Compartilhar a boa notícia
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                        <Button
-                          onClick={() => handleShare('whatsapp')}
-                          variant="outline"
-                          className="w-full cursor-pointer border-gray-300 text-white hover:outline-2 hover:outline-black hover:text-black hover:bg-gray-50 hover:border-gray-400 font-normal py-2.5 px-4 rounded-sm text-sm transition-colors duration-200"
-                        >
-                          <div className="flex items-center justify-center gap-2">
-                           <WhatsappLogo size={22} />
-                            WhatsApp
-                          </div>
-                        </Button>
-                      </motion.div>
-                      
-                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                        <Button
-                          onClick={() => handleShare('instagram')}
-                          variant="outline"
-                          className="w-full cursor-pointer border-gray-300 text-white
-                           hover:text-black hover:bg-gray-50 hover:outline-2 hover:outline-black font-normal py-2.5 px-4 rounded-sm text-sm transition-colors duration-200"
-                        >
-                          <div className="flex items-center justify-center gap-2">
-                           <InstagramLogoIcon size={22} weight="bold" />
-                            Instagram
-                          </div>
-                        </Button>
-                      </motion.div>
-                    </div>
+                    <UsefulActions person={person} />
                   </motion.div>
                 </motion.div>
               </div>

@@ -1,3 +1,5 @@
+import { config } from '@/lib/config';
+
 // Interface para a resposta da API do Abitus baseada na estrutura real
 export interface AbitusPerson {
   id: number;
@@ -83,7 +85,7 @@ export async function loadAllPersons(): Promise<Person[]> {
 
   try {
     // Primeiro request para descobrir total de páginas
-    const firstUrl = 'https://abitus-api.geia.vip/v1/pessoas/aberto/filtro?pagina=1&porPagina=50&faixaIdadeInicial=0&faixaIdadeFinal=120';
+    const firstUrl = `${config.api.baseUrl}/pessoas/aberto/filtro?pagina=1&porPagina=50&faixaIdadeInicial=0&faixaIdadeFinal=120`;
     const firstResponse = await fetch(firstUrl, {
       method: 'GET',
       headers: {
@@ -102,7 +104,7 @@ export async function loadAllPersons(): Promise<Person[]> {
 
     // Buscar as demais páginas (2..totalPages)
     for (let page = 2; page <= totalPages; page++) {
-      const pageUrl = `https://abitus-api.geia.vip/v1/pessoas/aberto/filtro?pagina=${page}&porPagina=50&faixaIdadeInicial=0&faixaIdadeFinal=120`;
+      const pageUrl = `${config.api.baseUrl}/pessoas/aberto/filtro?pagina=${page}&porPagina=50&faixaIdadeInicial=0&faixaIdadeFinal=120`;
       const resp = await fetch(pageUrl, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },

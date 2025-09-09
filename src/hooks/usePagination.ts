@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
+import { config } from '@/lib/config';
 
 interface UsePaginationOptions {
   defaultPageSize?: number;
@@ -19,7 +20,7 @@ interface UsePaginationReturn {
 }
 
 export function usePagination({
-  defaultPageSize = 12,
+  defaultPageSize = config.pagination.defaultPageSize,
   defaultPage = 1,
   preserveFilters = true
 }: UsePaginationOptions = {}): UsePaginationReturn {

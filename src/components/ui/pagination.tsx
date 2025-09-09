@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './button';
+import { config } from '@/lib/config';
 
 interface PaginationProps {
   currentPage: number;
@@ -14,7 +15,7 @@ interface PaginationProps {
   className?: string;
 }
 
-const PAGE_SIZE_OPTIONS = [10, 20, 50];
+const PAGE_SIZE_OPTIONS = config.pagination.pageSizeOptions;
 
 export function Pagination({
   currentPage,

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// URL da API externa
-const EXTERNAL_API_URL = 'https://abitus-api.geia.vip/v1';
+import { config } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,7 +57,7 @@ export async function POST(request: NextRequest) {
     
     try {
       // Buscar dados da pessoa para obter o ocoId real
-      const pessoaResponse = await fetch(`https://abitus-api.geia.vip/v1/pessoas/aberto/filtro?pagina=0&porPagina=1000`, {
+      const pessoaResponse = await fetch(`${config.api.baseUrl}/pessoas/aberto/filtro?pagina=0&porPagina=1000`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -80,7 +78,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Dados sendo enviados para API externa:', externalData);
-    console.log('URL da API externa:', `${EXTERNAL_API_URL}/ocorrencias/informacoes-desaparecido`);
+    console.log('URL da API externa:', `${config.api.baseUrl}/ocorrencias/informacoes-desaparecido`);
 
     // Preparar query parameters para a URL
     const queryParams = new URLSearchParams({
@@ -103,7 +101,7 @@ export async function POST(request: NextRequest) {
 
     console.log('Query params:', queryParams.toString());
     console.log('FormData preparado:', Object.fromEntries(externalFormData.entries()));
-    console.log('URL completa:', `${EXTERNAL_API_URL}/ocorrencias/informacoes-desaparecido?${queryParams.toString()}`);
+    console.log('URL completa:', `${config.api.baseUrl}/ocorrencias/informacoes-desaparecido?${queryParams.toString()}`);
     console.log('Arquivos sendo enviados:', photos.length > 0 ? `${photos.length} arquivo(s)` : 'Nenhum arquivo');
 
     // Tentar fazer requisição para a API externa
@@ -111,7 +109,7 @@ export async function POST(request: NextRequest) {
     let useExternalAPI = true;
     
     try {
-      response = await fetch(`${EXTERNAL_API_URL}/ocorrencias/informacoes-desaparecido?${queryParams.toString()}`, {
+      response = await fetch(`${config.api.baseUrl}/ocorrencias/informacoes-desaparecido?${queryParams.toString()}`, {
         method: 'POST',
         headers: {
           'accept': '*/*',
@@ -185,7 +183,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fazer requisição para a API externa para buscar informações
-    const response = await fetch(`${EXTERNAL_API_URL}/ocorrencias/informacoes-desaparecido?ocold=${ocold}`, {
+    const response = await fetch(`${config.api.baseUrl}/ocorrencias/informacoes-desaparecido?ocold=${ocold}`, {
       method: 'GET',
       headers: {
         // Headers de autenticação se necessário

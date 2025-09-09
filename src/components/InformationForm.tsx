@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Trash2, Calendar, MapPin, User, Phone, Mail, FileText, Eye, EyeOff, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
+import { config } from '@/lib/config';
 
 interface InformationFormProps {
   isOpen: boolean;
@@ -79,36 +80,35 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     
-    // Validação: máximo de 5 fotos
-    if (photos.length + files.length > 5) {
-      toast.error('Máximo de 5 fotos permitido');
+    // Validação: máximo de fotos
+    if (photos.length + files.length > config.upload.maxFiles) {
+      toast.error(`Máximo de ${config.upload.maxFiles} fotos permitido`);
       return;
     }
 
     // Validação: tipos de arquivo permitidos
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    const invalidFiles = files.filter(file => !allowedTypes.includes(file.type));
+    const invalidFiles = files.filter(file => !config.upload.allowedTypes.includes(file.type as any));
     
     if (invalidFiles.length > 0) {
       toast.error('Apenas arquivos de imagem são permitidos (JPG, PNG, GIF, WebP)');
       return;
     }
 
-    // Validação: tamanho máximo de 5MB por arquivo
-    const maxSize = 5 * 1024 * 1024; // 5MB em bytes
-    const oversizedFiles = files.filter(file => file.size > maxSize);
+    // Validação: tamanho máximo por arquivo
+    const oversizedFiles = files.filter(file => file.size > config.upload.maxFileSize);
     
     if (oversizedFiles.length > 0) {
-      toast.error('Cada arquivo deve ter no máximo 5MB');
+      toast.error(`Cada arquivo deve ter no máximo ${config.upload.maxFileSize / 1024 / 1024}MB`);
       return;
     }
 
-    // Validação: tamanho total não pode exceder 25MB (5 arquivos × 5MB)
+    // Validação: tamanho total não pode exceder o limite
     const totalSize = files.reduce((sum, file) => sum + file.size, 0);
     const currentTotalSize = photos.reduce((sum, file) => sum + file.size, 0);
+    const maxTotalSize = config.upload.maxFiles * config.upload.maxFileSize;
     
-    if (currentTotalSize + totalSize > 25 * 1024 * 1024) {
-      toast.error('Tamanho total dos arquivos não pode exceder 25MB');
+    if (currentTotalSize + totalSize > maxTotalSize) {
+      toast.error(`Tamanho total dos arquivos não pode exceder ${maxTotalSize / 1024 / 1024}MB`);
       return;
     }
 
@@ -540,7 +540,7 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
                         Clique para selecionar fotos ou arraste aqui
                       </p>
                       <p className="text-sm text-gray-500">
-                        Máximo 5 fotos • 5MB por arquivo • JPG, PNG, GIF, WebP
+                        Máximo {config.upload.maxFiles} fotos • {config.upload.maxFileSize / 1024 / 1024}MB por arquivo • JPG, PNG, GIF, WebP
                       </p>
                       <motion.button
                         type="button"
@@ -584,7 +584,7 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
                         ))}
                       </div>
                       
-                      {photoPreviews.length < 5 && (
+                      {photoPreviews.length < config.upload.maxFiles && (
                         <div className="text-center">
                           <motion.button
                             type="button"
@@ -593,10 +593,10 @@ export function InformationForm({ isOpen, onClose, personId, personName }: Infor
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
-                            Adicionar Mais Fotos ({photoPreviews.length}/5)
+                            Adicionar Mais Fotos ({photoPreviews.length}/{config.upload.maxFiles})
                           </motion.button>
                           <p className="text-xs text-gray-500 mt-2">
-                            {5 - photoPreviews.length} foto(s) restante(s)
+                            {config.upload.maxFiles - photoPreviews.length} foto(s) restante(s)
                           </p>
                         </div>
                       )}

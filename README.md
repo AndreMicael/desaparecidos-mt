@@ -37,6 +37,7 @@ Sistema completo para divulgação e gerenciamento de informações sobre pessoa
 ## 📋 Sumário
 - [Tecnologias](#tecnologias)
 - [Pré-requisitos](#pré-requisitos)
+- [Configuração de Ambiente](#configuração-de-ambiente)
 - [Arquitetura do Sistema](#arquitetura-do-sistema)
 - [Como rodar o projeto](#como-rodar-o-projeto)
 - [Funcionalidades](#funcionalidades)
@@ -88,6 +89,44 @@ Sistema completo para divulgação e gerenciamento de informações sobre pessoa
 ## 📋 Pré-requisitos
 - **Node.js 18+** (recomendado LTS)
 - **npm 9+** (ou yarn/pnpm/bun)
+
+## ⚙️ Configuração de Ambiente
+
+### 1. Variáveis de Ambiente
+
+Copie o arquivo `.env.example` para `.env.local` e configure as variáveis:
+
+```bash
+cp .env.example .env.local
+```
+
+### 2. Variáveis Disponíveis
+
+```env
+# Configurações da API Externa (Abitus)
+NEXT_PUBLIC_API_BASE_URL=https://abitus-api.geia.vip/v1
+
+# Configurações do Next.js
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Configurações de Desenvolvimento
+NODE_ENV=development
+
+# Configurações de Upload (opcional)
+NEXT_PUBLIC_MAX_FILE_SIZE=5242880
+NEXT_PUBLIC_MAX_FILES=5
+
+# Configurações de Cache (opcional)
+NEXT_PUBLIC_CACHE_TTL=300000
+```
+
+### 3. Configurações Centralizadas
+
+O projeto usa um arquivo de configuração centralizado em `src/lib/config.ts` que:
+- ✅ **Evita URLs hardcoded** no código
+- ✅ **Usa variáveis de ambiente** com fallbacks seguros
+- ✅ **Centraliza todas as configurações** em um local
+- ✅ **Facilita mudanças** entre ambientes (dev/prod)
 
 ## 🏗️ Arquitetura do Sistema
 

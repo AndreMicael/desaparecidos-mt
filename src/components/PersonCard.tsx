@@ -7,6 +7,7 @@ import { ImageWithFallback } from './ui/image-with-fallback';
 import { Person } from '@/types/person';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { getStatusColors, getStatusBadgeClasses } from '@/lib/status-colors';
 
 interface PersonCardProps {
   person: Person;
@@ -107,13 +108,10 @@ export function PersonCard({ person, onClick }: PersonCardProps) {
               transition={{ duration: 0.2, delay: 0.05 }}
             >
               <Badge 
-                variant={person.localizado ? "default" : "destructive"}
-                className={person.localizado 
-                  ? "bg-emerald-700 text-white hover:bg-gray-800 border-none font-medium text-xs rounded-sm" 
-                  : "bg-red-800 text-white hover:bg-gray-800 border-none font-medium text-xs rounded-sm"
-                }
+                variant={getStatusColors(person.localizado).variant}
+                className={getStatusBadgeClasses(person.localizado)}
               >
-                {person.localizado ? 'Localizado' : 'Desaparecido'}
+                {getStatusColors(person.localizado).label}
               </Badge>
             </motion.div>
           </div>

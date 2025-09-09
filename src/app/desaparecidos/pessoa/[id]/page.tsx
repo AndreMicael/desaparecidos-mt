@@ -11,6 +11,7 @@ import { InstagramLogoIcon, WhatsappLogo } from '@phosphor-icons/react';
 import { PosterGenerator } from '@/components/PosterGenerator';
 import { InformationForm } from '@/components/InformationForm';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getSimpleStatusBadgeClasses } from '@/lib/status-colors';
 
 // Lazy loading dos componentes
 const Button = dynamic(() => import('@/components/ui/button').then(mod => ({ default: mod.Button })), {
@@ -315,7 +316,7 @@ export default function DesaparecidoPage() {
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.4, delay: 0.5 }}
                   >
-                    <span className="bg-gray-800 text-white px-3 py-1 text-xs sm:text-sm font-medium rounded-sm uppercase tracking-wide">
+                    <span className={getSimpleStatusBadgeClasses(false)}>
                       Desaparecido
                     </span>
                   </motion.div>

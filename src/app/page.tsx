@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from 'react';
 import { Person } from '@/types/person';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HeroSection } from '@/components/HeroSection';
@@ -11,7 +10,10 @@ import { PersonCard } from '@/components/PersonCard';
 import { SearchFilters } from '@/types/person';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/ui/pagination';
+import { PeopleListSkeleton, PeopleEmptyState, PeopleErrorState } from '@/components/ui/network-states';
+import { useApiCache } from '@/hooks/useApi';
 import dynamic from 'next/dynamic';
+import { Loader2 } from 'lucide-react';
 
 // Lazy loading dos componentes
 const Button = dynamic(() => import('@/components/ui/button').then(mod => ({ default: mod.Button })), {
@@ -29,9 +31,6 @@ const Toaster = dynamic(() => import('@/components/ui/sonner').then(mod => ({ de
 function HomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [persons, setPersons] = useState<Person[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [totalPages, setTotalPages] = useState(1);
   const [totalPessoas, setTotalPessoas] = useState(449);
   const [pessoasLocalizadas, setPessoasLocalizadas] = useState(23);
   
@@ -40,56 +39,67 @@ function HomePageContent() {
     defaultPage: 1
   });
 
-  useEffect(() => {
-    // Carregar dados quando página ou pageSize mudarem
-    loadPersons(currentPage);
-  }, [currentPage, pageSize]);
-
-  const loadPersons = async (page: number = 1, filters?: SearchFilters) => {
-    try {
-      setLoading(true);
-      
-      const urlParams = new URLSearchParams({
-        page: page.toString(),
-        pageSize: pageSize.toString()
-      });
-
-      // Adicionar filtros se fornecidos
-      if (filters) {
-        if (filters.nome) urlParams.append('nome', filters.nome);
-        if (filters.idadeMinima) urlParams.append('idadeMinima', filters.idadeMinima);
-        if (filters.idadeMaxima) urlParams.append('idadeMaxima', filters.idadeMaxima);
-        if (filters.sexos && filters.sexos.length > 0) {
-          filters.sexos.forEach(sexo => urlParams.append('sexos', sexo));
-        }
-        if (filters.status && filters.status.length > 0) {
-          filters.status.forEach(status => urlParams.append('status', status));
-        }
-      }
-
-      const response = await fetch(`/api/pessoas?${urlParams.toString()}`);
-      
-      if (!response.ok) {
-        throw new Error(`Erro na API: ${response.status}`);
-      }
-
-      const result = await response.json();
-      setPersons(result.data);
-      setTotalPages(Math.ceil(result.total / pageSize));
-    } catch (error) {
-      console.error('Erro ao carregar pessoas:', error);
-      toast.error('Erro ao carregar dados.');
-    } finally {
-      setLoading(false);
+  // Cache para dados das pessoas
+  const { 
+    data: personsData, 
+    loading, 
+    error, 
+    revalidate 
+  } = useApiCache<{ persons: Person[]; totalPages: number }>(
+    `persons-page-${currentPage}-size-${pageSize}`,
+    () => loadPersons(currentPage),
+    {
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+      dedupingInterval: 5000, // 5 segundos
     }
+  );
+
+  const persons = personsData?.persons || [];
+  const totalPages = personsData?.totalPages || 1;
+
+  const loadPersons = async (page: number = 1, filters?: SearchFilters): Promise<{ persons: Person[]; totalPages: number }> => {
+    const urlParams = new URLSearchParams({
+      page: page.toString(),
+      pageSize: pageSize.toString()
+    });
+
+    // Adicionar filtros se fornecidos
+    if (filters) {
+      if (filters.nome) urlParams.append('nome', filters.nome);
+      if (filters.idadeMinima) urlParams.append('idadeMinima', filters.idadeMinima);
+      if (filters.idadeMaxima) urlParams.append('idadeMaxima', filters.idadeMaxima);
+      if (filters.sexos && filters.sexos.length > 0) {
+        filters.sexos.forEach(sexo => urlParams.append('sexos', sexo));
+      }
+      if (filters.status && filters.status.length > 0) {
+        filters.status.forEach(status => urlParams.append('status', status));
+      }
+    }
+
+    const response = await fetch(`/api/pessoas?${urlParams.toString()}`);
+    
+    if (!response.ok) {
+      throw new Error(`Erro na API: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const totalPages = Math.ceil(result.total / pageSize);
+    
+    // Atualizar estatísticas globais
+    setTotalPessoas(result.total);
+    const localizadas = result.data.filter((p: Person) => p.localizado).length;
+    setPessoasLocalizadas(localizadas);
+    
+    return {
+      persons: result.data,
+      totalPages
+    };
   };
 
   const handleSearch = async (filters: SearchFilters) => {
     // Reset para página 1 ao fazer nova busca
     setPage(1);
-    
-    // Executar a busca diretamente
-    await loadPersons(1, filters);
     
     // Atualizar a URL com os filtros
     const params: Record<string, string> = {};
@@ -105,12 +115,15 @@ function HomePageContent() {
     }
     
     updateUrl(params);
+    
+    // Revalidar cache com novos filtros
+    revalidate();
   };
 
   const handleClear = () => {
     setPage(1);
-    loadPersons(1);
     router.push('/');
+    revalidate();
   };
 
 
@@ -236,7 +249,7 @@ function HomePageContent() {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3 }}
               >
-                <PersonCardGridSkeleton />
+                <PeopleListSkeleton count={pageSize} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -279,27 +292,30 @@ function HomePageContent() {
             className="mt-8"
           />
 
-          {/* No Results */}
+          {/* Error State */}
           <AnimatePresence>
-            {!loading && persons.length === 0 && (
-              <motion.div 
-                className="text-center py-12"
+            {error && (
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
               >
-                <p className="text-gray-600 text-lg mb-4">
-                  Nenhuma pessoa encontrada com os filtros aplicados.
-                </p>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    onClick={handleClear}
-                    className="bg-yellow-400 text-black hover:bg-yellow-500 border-2 border-yellow-400"
-                  >
-                    Limpar filtros
-                  </Button>
-                </motion.div>
+                <PeopleErrorState onRetry={revalidate} error={error} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Empty State */}
+          <AnimatePresence>
+            {!loading && !error && persons.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+              >
+                <PeopleEmptyState onRetry={revalidate} />
               </motion.div>
             )}
           </AnimatePresence>

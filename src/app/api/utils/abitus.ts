@@ -1,4 +1,5 @@
 import { config } from '@/lib/config';
+import { apiClient } from '@/lib/api-client';
 
 // Interface para a resposta da API do Abitus baseada na estrutura real
 export interface AbitusPerson {
@@ -85,36 +86,26 @@ export async function loadAllPersons(): Promise<Person[]> {
 
   try {
     // Primeiro request para descobrir total de páginas
-    const firstUrl = `${config.api.baseUrl}/pessoas/aberto/filtro?pagina=1&porPagina=50&faixaIdadeInicial=0&faixaIdadeFinal=120`;
-    const firstResponse = await fetch(firstUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!firstResponse.ok) {
-      throw new Error(`Erro na API: ${firstResponse.status} ${firstResponse.statusText}`);
-    }
-
-    const firstData: AbitusResponse = await firstResponse.json();
+    const firstData: AbitusResponse = await apiClient.get<AbitusResponse>(
+      '/pessoas/aberto/filtro?pagina=1&porPagina=50&faixaIdadeInicial=0&faixaIdadeFinal=120'
+    );
 
     const totalPages = Math.max(1, firstData.totalPages || 1);
     const aggregated: AbitusPerson[] = [...(firstData.content || [])];
 
     // Buscar as demais páginas (2..totalPages)
     for (let page = 2; page <= totalPages; page++) {
-      const pageUrl = `${config.api.baseUrl}/pessoas/aberto/filtro?pagina=${page}&porPagina=50&faixaIdadeInicial=0&faixaIdadeFinal=120`;
-      const resp = await fetch(pageUrl, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (!resp.ok) {
-        throw new Error(`Erro na API (página ${page}): ${resp.status} ${resp.statusText}`);
-      }
-      const data: AbitusResponse = await resp.json();
-      if (Array.isArray(data.content) && data.content.length > 0) {
-        aggregated.push(...data.content);
+      try {
+        const data: AbitusResponse = await apiClient.get<AbitusResponse>(
+          `/pessoas/aberto/filtro?pagina=${page}&porPagina=50&faixaIdadeInicial=0&faixaIdadeFinal=120`
+        );
+        
+        if (Array.isArray(data.content) && data.content.length > 0) {
+          aggregated.push(...data.content);
+        }
+      } catch (error) {
+        console.warn(`Erro ao carregar página ${page}:`, error);
+        // Continuar com as páginas restantes mesmo se uma falhar
       }
     }
 

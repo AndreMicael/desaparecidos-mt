@@ -7,7 +7,9 @@ export const config = {
   // API Externa (Abitus)
   api: {
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://abitus-api.geia.vip/v1',
-    timeout: 10000, // 10 segundos
+    timeout: 15000, // 15 segundos
+    retryAttempts: 3,
+    retryDelay: 1000, // 1 segundo
   },
   
   // Aplicação

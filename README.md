@@ -1,14 +1,31 @@
 # Sistema de Pessoas Desaparecidas – Polícia Civil MT
 
+## 👨‍💻 Desenvolvedor
+
+<div align="center">
+
+### André Micael
+**Desenvolvedor Full Stack | React/Next.js Specialist**
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/andremsampaio/)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AndreMicael)
+[![Portfolio](https://img.shields.io/badge/Portfolio-FF5722?style=for-the-badge&logo=firefox&logoColor=white)](https://andremicael.com)
+
+**📧 Email**: [contato@andremicael.dev](mailto:andremicael@gmail.com)  
+**🌐 Site**: [andremicael.com](https://andremicael.com)  
+**💼 LinkedIn**: [linkedin.com/in/andremsampaio](https://www.linkedin.com/in/andremsampaio/)  
+**💻 GitHub**: [github.com/AndreMicael](https://github.com/AndreMicael)
+
+</div>
+
+---
+
 <div align="center">
 
 ![React](https://img.shields.io/badge/React-19.1-blue?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
 ![Next.js](https://img.shields.io/badge/Next.js-15.4-black?style=for-the-badge&logo=next.js)
 
-[![CI/CD Pipeline](https://github.com/AndreMicael/desaparecidos-mt/workflows/CI%20Pipeline/badge.svg)](https://github.com/AndreMicael/desaparecidos-mt/actions)
-[![Dependencies](https://github.com/AndreMicael/desaparecidos-mt/workflows/Dependencies%20Management/badge.svg)](https://github.com/AndreMicael/desaparecidos-mt/actions)
-[![Deploy](https://github.com/AndreMicael/desaparecidos-mt/workflows/Deploy/badge.svg)](https://github.com/AndreMicael/desaparecidos-mt/actions)
 
 
 </div>
@@ -1135,25 +1152,6 @@ O sistema inclui logs detalhados no console para:
 - Submissão de formulários
 - Comunicação com API externa
 - Upload de arquivos
-
-## 👨‍💻 Desenvolvedor
-
-### André Micael
-**Desenvolvedor Full Stack | React/Next.js Specialist**
-
-<div align="center">
-
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AndreMicael)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/andremsampaio/)
-[![Portfolio](https://img.shields.io/badge/Portfolio-FF5722?style=for-the-badge&logo=firefox&logoColor=white)](https://andremicael.com)
-
-</div>
-
-### 📞 Contato
-- **LinkedIn**: [linkedin.com/in/andremsampaio](https://www.linkedin.com/in/andremsampaio/)
-- **Site**: [andremicael.com](https://andremicael.com)
-- **GitHub**: [github.com/AndreMicael](https://github.com/AndreMicael)
-- **Email**: [contato@andremicael.dev](mailto:contato@andremicael.dev)
 
 ### 🚀 Sobre o Projeto
 Este sistema foi desenvolvido como uma solução completa para a **Polícia Civil de Mato Grosso**, visando facilitar a divulgação e gerenciamento de informações sobre pessoas desaparecidas. O projeto demonstra expertise em:

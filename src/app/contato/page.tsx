@@ -80,7 +80,7 @@ export default function ContatoPage() {
       >
         <div className="max-w-7xl mx-auto px-4 text-center">
           <motion.h1 
-            className="text-4xl md:text-5xl font-bold text-black mb-4"
+            className="text-4xl md:text-5xl font-bold text-white mb-4"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -88,7 +88,7 @@ export default function ContatoPage() {
             CONTATO
           </motion.h1>
           <motion.p 
-            className="text-xl text-black/80 max-w-2xl mx-auto"
+            className="text-xl text-white/90 max-w-2xl mx-auto"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -163,7 +163,7 @@ export default function ContatoPage() {
                       whileHover={{ rotate: 360, scale: 1.1 }}
                       transition={{ duration: 0.6 }}
                     >
-                      <contact.icon className="w-6 h-6 text-black" />
+                      <contact.icon className="w-6 h-6 text-white" />
                     </motion.div>
                     <div>
                       <h3 className="text-xl font-semibold text-black mb-2">{contact.title}</h3>
@@ -341,12 +341,12 @@ export default function ContatoPage() {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 flex items-center justify-center gap-2"
+                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>
                         <motion.div 
-                          className="w-4 h-4 border-2 border-black border-t-transparent rounded-full"
+                          className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         />

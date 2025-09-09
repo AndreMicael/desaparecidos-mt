@@ -107,7 +107,7 @@ export default function LocalizadosPage() {
       >
         <div className="max-w-7xl mx-auto px-4 text-center">
           <motion.h1 
-            className="text-4xl md:text-5xl font-bold text-black mb-4"
+            className="text-4xl md:text-5xl font-bold text-white mb-4"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -115,7 +115,7 @@ export default function LocalizadosPage() {
             PESSOAS LOCALIZADAS
           </motion.h1>
           <motion.p 
-            className="text-xl text-black/80 max-w-2xl mx-auto"
+            className="text-xl text-white/90 max-w-2xl mx-auto"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
